@@ -23,7 +23,7 @@ typedef Belos::LinearProblem<ScalarT, LA_MultiVector, LA_Operator> LA_LinearProb
 solver::solver(const Teuchos::RCP<LA_MpiComm> & Comm_, Teuchos::RCP<Teuchos::ParameterList> & settings,
                Teuchos::RCP<meshInterface> & mesh_,
                Teuchos::RCP<discretization> & disc_,
-               Teuchos::RCP<physics> & phys_, Teuchos::RCP<panzer::DOFManager<LO,GO> > & DOF_,
+	       Teuchos::RCP<physics> & phys_, Teuchos::RCP<panzer::DOFManager> & DOF_,
                Teuchos::RCP<AssemblyManager> & assembler_,
                Teuchos::RCP<ParameterManager> & params_) :
 Comm(Comm_), mesh(mesh_), disc(disc_), phys(phys_), DOF(DOF_), assembler(assembler_), params(params_) { 
@@ -157,7 +157,8 @@ Comm(Comm_), mesh(mesh_), disc(disc_), phys(phys_), DOF(DOF_), assembler(assembl
   //}
   
   globalNumUnknowns = 0;
-  Teuchos::reduceAll(*Comm,Teuchos::REDUCE_SUM,1,&localNumUnknowns,&globalNumUnknowns);
+  int temp = int(globalNumUnknowns);
+  Teuchos::reduceAll(*Comm,Teuchos::REDUCE_SUM,1,&localNumUnknowns,&temp);
   //Comm->SumAll(&localNumUnknowns, &globalNumUnknowns, 1);
   
   // needed information from the disc interface
@@ -1226,11 +1227,11 @@ void solver::setDirichlet(vector_RCP & initial) {
         
         for( int i=0; i<numSides; i++ ) {
           if( side_info(i,0)==1 ) {
-            vector<GO> elemGIDs;
+	    vector<GO> elemGIDs;
             int gside_index = side_info(i,1);
             string gside = phys->sideSets[gside_index];
-            size_t elemID = disc->myElements[b][e];
-            DOF->getElementGIDs(elemID, elemGIDs, blockID); // global index of each node
+	    panzer::LocalOrdinal elemID = disc->myElements[b][e];
+            DOF->getElementGIDs(elemID, elemGIDs); // global index of each node
             // get the side index and the node->global mapping for the side that is on the boundary
             const pair<vector<int>,vector<int> > SideIndex = DOF->getGIDFieldOffsets_closure(blockID, fnum, spaceDim-1, i);
             const vector<int> elmtOffset = SideIndex.first;

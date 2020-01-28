@@ -227,8 +227,8 @@ void ParameterManager::setupDiscretizedParameters(vector<vector<Teuchos::RCP<cel
       
     }
     
-    paramDOF = Teuchos::rcp(new panzer::DOFManager<int,int>());
-    Teuchos::RCP<panzer::ConnManager<int,int> > conn = Teuchos::rcp(new panzer_stk::STKConnManager<int>(mesh));
+    paramDOF = Teuchos::rcp(new panzer::DOFManager());
+    Teuchos::RCP<panzer::ConnManager> conn = Teuchos::rcp(new panzer_stk::STKConnManager(mesh));
     paramDOF->setConnManager(conn,*(Comm->getRawMpiComm()));
     
     Teuchos::RCP<const panzer::Intrepid2FieldPattern> Pattern;

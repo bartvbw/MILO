@@ -83,7 +83,9 @@ public:
   virtual void updateMeshData(Kokkos::View<ScalarT**,HostDevice> & rotation_data) = 0;
   
   Teuchos::RCP<LA_MpiComm> LocalComm;
-  Teuchos::RCP<SolutionStorage<LA_MultiVector> > soln, solndot, adjsoln;
+  //bvbw  Teuchos::RCP<SolutionStorage<LA_MultiVector> > soln, solndot, adjsoln;
+  Teuchos::RCP<SolutionStorage<LA_MultiVector> > solndot, adjsoln;
+  Teuchos::RCP<SolutionStorage<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > > soln;
   
   bool useMachineLearning = false;
   
@@ -97,10 +99,14 @@ public:
   int macro_block;
   ScalarT cost_estimate;
   
-  Teuchos::RCP<const LA_Map> owned_map, overlapped_map;
-  Teuchos::RCP<LA_CrsGraph> owned_graph, overlapped_graph;
+  //bvbw  Teuchos::RCP<const LA_Map> owned_map, overlapped_map;
+  Teuchos::RCP<const Tpetra::Map<LO, int, HostNode> > owned_map, overlapped_map;
+  //bvbw Teuchos::RCP<LA_CrsGraph> owned_graph, overlapped_graph;
+  Teuchos::RCP<LA_CrsGraph> owned_graph;
+  Teuchos::RCP<Tpetra::CrsGraph<LO,int,HostNode> > overlapped_graph;
   
-  Teuchos::RCP<LA_Export> exporter;
+  //bvbw  Teuchos::RCP<LA_Export> exporter;
+  Teuchos::RCP<Tpetra::Export<LO, int, HostNode> > exporter;
   Teuchos::RCP<LA_Import> importer;
   
   vector<Teuchos::RCP<vector<AD> > > paramvals_AD;

@@ -173,7 +173,7 @@ Commptr(Comm_) {
 
 void discretization::setIntegrationInfo(vector<vector<Teuchos::RCP<cell> > > & cells,
                                         vector<vector<Teuchos::RCP<BoundaryCell> > > & boundaryCells,
-                                        Teuchos::RCP<panzer::DOFManager<int,int> > & DOF,
+                                        Teuchos::RCP<panzer::DOFManager> & DOF,
                                         Teuchos::RCP<physics> & phys) {
   for (size_t b=0; b<cells.size(); b++) {
     int eprog = 0;
@@ -181,12 +181,12 @@ void discretization::setIntegrationInfo(vector<vector<Teuchos::RCP<cell> > > & c
       int numElem = cells[b][e]->numElem;
       
       // Build the Kokkos View of the cell GIDs ------
-      vector<vector<int> > cellGIDs;
+      vector<vector<panzer::GlobalOrdinal> > cellGIDs;
       int numLocalDOF = 0;
       for (int i=0; i<numElem; i++) {
-        vector<int> GIDs;
-        size_t elemID = this->myElements[b][eprog+i];
-        DOF->getElementGIDs(elemID, GIDs, phys->blocknames[b]);
+	std::vector<panzer::GlobalOrdinal> GIDs;
+	panzer::LocalOrdinal elemID = this->myElements[b][eprog+i];
+        DOF->getElementGIDs(elemID, GIDs);
         cellGIDs.push_back(GIDs);
         numLocalDOF = GIDs.size(); // should be the same for all elements
       }
@@ -228,12 +228,12 @@ void discretization::setIntegrationInfo(vector<vector<Teuchos::RCP<cell> > > & c
       int numElem = boundaryCells[b][e]->numElem;
       
       // Build the Kokkos View of the cell GIDs ------
-      vector<vector<int> > cellGIDs;
+      vector<vector<panzer::GlobalOrdinal> > cellGIDs;
       int numLocalDOF = 0;
       for (int i=0; i<numElem; i++) {
-        vector<int> GIDs;
-        size_t elemID = boundaryCells[b][e]->localElemID(i);
-        DOF->getElementGIDs(elemID, GIDs, phys->blocknames[b]);
+	std::vector<panzer::GlobalOrdinal> GIDs;
+	panzer::LocalOrdinal elemID = boundaryCells[b][e]->localElemID(i);
+        DOF->getElementGIDs(elemID, GIDs);
         cellGIDs.push_back(GIDs);
         numLocalDOF = GIDs.size(); // should be the same for all elements
       }

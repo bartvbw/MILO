@@ -103,8 +103,8 @@ class MultiScale {
   Teuchos::RCP<Teuchos::ParameterList> settings;
   vector<vector<Teuchos::RCP<cell> > > cells;
   vector<Teuchos::RCP<workset> > macro_wkset;
-  vector<vector<Teuchos::RCP<LA_CrsMatrix> > > subgrid_projection_maps;
-  vector<Teuchos::RCP<Amesos2::Solver<LA_CrsMatrix,LA_MultiVector> > > subgrid_projection_solvers;
+  vector<vector<Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode> > > > subgrid_projection_maps;
+  vector<Teuchos::RCP<Amesos2::Solver<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode>,Tpetra::MultiVector<ScalarT,LO,int,HostNode> > > > subgrid_projection_solvers;
   Teuchos::RCP<FunctionInterface> macro_functionManager;
 };
 

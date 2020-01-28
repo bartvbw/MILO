@@ -144,14 +144,14 @@ public:
   vector<vector_RCP> auxsol;
   vector<vector_RCP> dRdP;
   bool have_dRdP;
-  Teuchos::RCP<const panzer::DOFManager<int,int> > discparamDOF;
+  Teuchos::RCP<const panzer::DOFManager> discparamDOF;
   vector<vector<ScalarT> > paramLowerBounds;
   vector<vector<ScalarT> > paramUpperBounds;
   vector<string> discretized_param_basis_types;
   vector<int> discretized_param_basis_orders, discretized_param_usebasis;
   vector<string> discretized_param_names;
   vector<basis_RCP> discretized_param_basis;
-  Teuchos::RCP<panzer::DOFManager<int,int> > paramDOF;
+  Teuchos::RCP<panzer::DOFManager> paramDOF;
   vector<vector<int> > paramoffsets;
   vector<int> paramNumBasis;
   int numParamUnknowns;     					 // total number of unknowns

@@ -26,7 +26,7 @@ typedef int GO;
 #define maxDerivs 64 // adjust this to improve performance
 #define PI 3.141592653589793238463
 #define MILO_DEBUG false
-typedef Teuchos::MpiComm<GO> LA_MpiComm;
+typedef Teuchos::MpiComm<int> LA_MpiComm;
 
 // AD typedefs
 typedef Sacado::Fad::DFad<ScalarT> DFAD; // used only when absolutely necessary
@@ -69,7 +69,9 @@ typedef Tpetra::CrsGraph<LO,GO,HostNode>            LA_CrsGraph;
 typedef Tpetra::Export<LO, GO, HostNode>            LA_Export;
 typedef Tpetra::Import<LO, GO, HostNode>            LA_Import;
 typedef Tpetra::Map<LO, GO, HostNode>               LA_Map;
+//bvbq typedef Tpetra::Map<LO, GOLONG, HostNode>               LA_Map;
 typedef Tpetra::Operator<ScalarT,LO,GO,HostNode>    LA_Operator;
+typedef Tpetra::MultiVector<ScalarT,LO,GO,HostNode> LA_MultiVector;
 typedef Tpetra::MultiVector<ScalarT,LO,GO,HostNode> LA_MultiVector;
 //typedef Belos::LinearProblem<ScalarT, LA_MultiVector, LA_Operator> LA_LinearProblem;
 

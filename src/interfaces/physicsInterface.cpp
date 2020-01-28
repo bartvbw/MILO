@@ -33,6 +33,7 @@
 //#include "phasefield.hpp"
 #include "msphasefield.hpp"
 #include "navierstokes.hpp"
+#include "stokes.hpp"
 //#include "euler.hpp"
 #include "linearelasticity.hpp"
 //#include "peridynamics.hpp"
@@ -511,6 +512,16 @@ void physics::importPhysics(Teuchos::RCP<Teuchos::ParameterList> & settings, Teu
     currmodules.push_back(navierstokes_RCP);
     currSubgrid.push_back(currsettings.get<bool>("subgrid_navierstokes",false));
   }
+
+  // Stokes
+  if (currsettings.get<bool>("solve_stokes",false)) {
+    Teuchos::RCP<stokes> stokes_RCP = Teuchos::rcp(new stokes(settings, numip, numip_side,
+							      numElemPerCell, functionManager,
+							      blocknum) );
+    
+    currmodules.push_back(stokes_RCP);
+    currSubgrid.push_back(currsettings.get<bool>("subgrid_stokes",false));
+  }
   
   /* not setting up correctly
    // Euler
@@ -596,7 +607,7 @@ void physics::importPhysics(Teuchos::RCP<Teuchos::ParameterList> & settings, Teu
 // to the DOF manager
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-Teuchos::RCP<panzer::DOFManager<int,int> > physics::buildDOF(Teuchos::RCP<panzer_stk::STK_Interface> & mesh) {
+Teuchos::RCP<panzer::DOFManager> physics::buildDOF(Teuchos::RCP<panzer_stk::STK_Interface> & mesh) {
   
   if (milo_debug_level > 0) {
     if (Commptr->getRank() == 0) {
@@ -604,8 +615,8 @@ Teuchos::RCP<panzer::DOFManager<int,int> > physics::buildDOF(Teuchos::RCP<panzer
     }
   }
   
-  Teuchos::RCP<panzer::DOFManager<int,int> > DOF = Teuchos::rcp(new panzer::DOFManager<int,int>());
-  Teuchos::RCP<panzer::ConnManager<int,int> > conn = Teuchos::rcp(new panzer_stk::STKConnManager<int>(mesh));
+  Teuchos::RCP<panzer::DOFManager> DOF = Teuchos::rcp(new panzer::DOFManager());
+  Teuchos::RCP<panzer::ConnManager> conn = Teuchos::rcp(new panzer_stk::STKConnManager(mesh));
   DOF->setConnManager(conn,*(Commptr->getRawMpiComm()));
   DOF->setOrientationsRequired(true);
   
@@ -1082,7 +1093,7 @@ int physics::getUniqueIndex(const int & block, const std::string & var) {
 
 void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
                         Teuchos::RCP<panzer_stk::STK_Interface> & mesh,
-                        Teuchos::RCP<panzer::DOFManager<int,int> > & DOF,
+                        Teuchos::RCP<panzer::DOFManager> & DOF,
                         std::vector<std::vector<int> > cards) {
   
   if (milo_debug_level > 0) {
@@ -1287,8 +1298,7 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
           //vector<int> var_offsets = DOF->getGIDFieldOffsets(blockID,num);
           vector<stk::mesh::Entity> nodeEntities;
           mesh->getMyNodes(nodeName, blockID, nodeEntities);
-          vector<int> elemGIDs;
-          
+	  std::vector<panzer::GlobalOrdinal> elemGIDs;
           vector<size_t> local_elem_Ids;
           vector<size_t> local_node_Ids;
           vector<stk::mesh::Entity> side_output;
@@ -1296,8 +1306,8 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
           
           for( size_t i=0; i<side_output.size(); i++ ) {
             local_elem_Ids.push_back(mesh->elementLocalId(side_output[i]));
-            size_t localid = localelemmap[local_elem_Ids[i]];
-            DOF->getElementGIDs(localid,elemGIDs,blockID);
+            panzer::LocalOrdinal localid = localelemmap[local_elem_Ids[i]];
+            DOF->getElementGIDs(localid,elemGIDs);
             block_dbc_dofs.push_back(elemGIDs[var_offsets[local_node_Ids[i]]]);
           }
         }
@@ -1343,7 +1353,7 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
     delete [] block_dbc_dofs_global;
     
     vector<int> dbc_final;
-    vector<int> ownedAndShared;
+    vector<panzer::GlobalOrdinal> ownedAndShared;
     DOF->getOwnedAndGhostedIndices(ownedAndShared);
     
     sort(all_dbcs.begin(),all_dbcs.end());
@@ -1400,7 +1410,7 @@ Kokkos::View<int****,HostDevice> physics::getSideInfo(const size_t & block,
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-vector<vector<int> > physics::getOffsets(const int & block, Teuchos::RCP<panzer::DOFManager<int,int> > & DOF) {
+vector<vector<int> > physics::getOffsets(const int & block, Teuchos::RCP<panzer::DOFManager> & DOF) {
   return offsets[block];
 }
 

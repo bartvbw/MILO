@@ -194,8 +194,8 @@ public:
   
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////
-  
-  vector_RCP copyData(vector_RCP & src) {
+
+  Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > copyData(vector_RCP & src) {
     
     vector_RCP dest = Teuchos::rcp( new LA_MultiVector(src->getMap(),1));
     

@@ -2556,6 +2556,9 @@ public:
     else if (physics == "navierstokes") {
       targ = Kokkos::View<AD***,AssemblyDevice>("target",numElem,spaceDim+1,numip);
     }
+    else if (physics == "stokes") {
+      targ = Kokkos::View<AD***,AssemblyDevice>("target",numElem,spaceDim+1,numip);
+    }
     else if (physics == "porous") {
       targ = Kokkos::View<AD***,AssemblyDevice>("target",numElem,1,numip);
     }

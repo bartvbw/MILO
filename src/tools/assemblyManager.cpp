@@ -19,7 +19,7 @@
 
 AssemblyManager::AssemblyManager(const Teuchos::RCP<LA_MpiComm> & Comm_, Teuchos::RCP<Teuchos::ParameterList> & settings,
                                  Teuchos::RCP<panzer_stk::STK_Interface> & mesh_, Teuchos::RCP<discretization> & disc_,
-                                 Teuchos::RCP<physics> & phys_, Teuchos::RCP<panzer::DOFManager<LO,GO> > & DOF_,
+                                 Teuchos::RCP<physics> & phys_, Teuchos::RCP<panzer::DOFManager> & DOF_,
                                  vector<vector<Teuchos::RCP<cell> > > & cells_,
                                  vector<vector<Teuchos::RCP<BoundaryCell> > > & boundaryCells_,
                                  Teuchos::RCP<ParameterManager> & params_) :
@@ -442,10 +442,10 @@ void AssemblyManager::assembleJacRes(vector_RCP & u, vector_RCP & u_dot,
             }
           }
         });
-        
+
         cells[b][e]->computeJacRes(current_time, isTransient, useadjoint, compute_jacobian, compute_sens,
                                    num_active_params, compute_disc_sens, false, store_adjPrev,
-                                   local_res, local_J, local_Jdot, !useNewBCs);
+                                   local_res, local_J, local_Jdot);
         
         
       }

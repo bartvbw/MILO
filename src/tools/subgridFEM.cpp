@@ -1496,7 +1496,7 @@ void SubGridFEM::subGridNonlinearSolver(Teuchos::RCP<LA_MultiVector> & sub_u,
         
         cells[usernum][e]->computeJacRes(time, isTransient, isAdjoint,
                                          true, false, num_active_params, false, false, false,
-                                         local_res, local_J, local_Jdot, false);
+                                         local_res, local_J, local_Jdot);
         
       }
       //KokkosTools::print(local_J);
@@ -1813,7 +1813,7 @@ void SubGridFEM::computeSubGridSolnSens(Teuchos::RCP<LA_MultiVector> & d_sub_u,
         
         cells[usernum][e]->computeJacRes(time, isTransient, isAdjoint,
                                          false, true, num_active_params, false, false, false,
-                                         local_res, local_J, local_Jdot, false);
+                                         local_res, local_J, local_Jdot);
         
         Kokkos::View<GO**,HostDevice>  GIDs = cells[usernum][e]->GIDs;
         for (int i=0; i<GIDs.dimension(0); i++) {
@@ -1930,7 +1930,8 @@ void SubGridFEM::computeSubGridSolnSens(Teuchos::RCP<LA_MultiVector> & d_sub_u,
         
         cells[usernum][e]->computeJacRes(time, isTransient, isAdjoint,
                                          true, false, num_active_params, false, true, false,
-                                         local_res, local_J, local_Jdot, false);
+                                         local_res, local_J, local_Jdot);
+
         Kokkos::View<GO**,HostDevice> GIDs = cells[usernum][e]->GIDs;
         Kokkos::View<GO**,HostDevice> aGIDs = cells[usernum][e]->auxGIDs;
         vector<vector<int> > aoffsets = cells[usernum][e]->auxoffsets;
