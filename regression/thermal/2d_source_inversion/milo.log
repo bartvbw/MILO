@@ -1,31 +1,41 @@
-terminate called after throwing an instance of 'std::runtime_error'
-  what():  /Users/tmwilde/Desktop/MILO/src/interfaces/userInterface.hpp:177:
-
-Throw number = 1
-
-Throw test that evaluated to true: true
-
-Error: the input.xml needs to contain either a Discretization sublist or a path to a Discretization settings file!
-[s998638:50011] *** Process received signal ***
-[s998638:50011] Signal: Abort trap: 6 (6)
-[s998638:50011] Signal code:  (0)
-[s998638:50011] *** End of error message ***
-terminate called after throwing an instance of 'std::runtime_error'
-  what():  /Users/tmwilde/Desktop/MILO/src/interfaces/userInterface.hpp:177:
-
-Throw number = 1
-
-Throw test that evaluated to true: true
-
-Error: the input.xml needs to contain either a Discretization sublist or a path to a Discretization settings file!
-[s998638:50012] *** Process received signal ***
-[s998638:50012] Signal: Abort trap: 6 (6)
-[s998638:50012] Signal code:  (0)
-[s998638:50012] *** End of error message ***
--------------------------------------------------------
-Primary job  terminated normally, but 1 process returned
-a non-zero exit code. Per user-direction, the job has been aborted.
--------------------------------------------------------
+[ceerws1112:08177] *** Process received signal ***
+[ceerws1112:08177] Signal: Segmentation fault (11)
+[ceerws1112:08177] Signal code: Address not mapped (1)
+[ceerws1112:08177] Failing at address: (nil)
+[ceerws1112:08177] [ 0] /lib64/libpthread.so.0[0x3c8080f7e0]
+[ceerws1112:08177] [ 1] ../../milo(_ZN4cell13computeJacResERKdRKbS3_S3_S3_RKiS3_S3_S3_N6Kokkos4ViewIPPPdJNS6_6SerialEEEESC_SC_+0x1189)[0x1096ca9]
+[ceerws1112:08177] [ 2] ../../milo(_ZN15AssemblyManager14assembleJacResERN7Teuchos3RCPIN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEESC_SC_SC_RKdSE_RKbSG_SG_SC_RNS1_INS2_9CrsMatrixIdiiS9_EEEESG_SE_SG_SG_RKiSC_SG_SM_+0xb4e)[0x106955e]
+[ceerws1112:08177] [ 3] ../../milo(_ZN15AssemblyManager14assembleJacResERN7Teuchos3RCPIN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEESC_SC_SC_RKdSE_RKbSG_SG_SC_RNS1_INS2_9CrsMatrixIdiiS9_EEEESG_SE_SG_SG_RKiSC_SG_+0x133)[0x106bba3]
+[ceerws1112:08177] [ 4] ../../milo(_ZN6solver15nonlinearSolverERN7Teuchos3RCPIN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEESC_SC_SC_RKdSE_+0x6ae)[0xeff82e]
+[ceerws1112:08177] [ 5] ../../milo(_ZN6solver12adjointModelERSt6vectorIdSaIdEE+0x1dd)[0xf0309d]
+[ceerws1112:08177] [ 6] ../../milo(_ZN3ROL14Objective_MILOIdE8gradientERNS_6VectorIdEERKS3_Rd+0x214)[0x10067d4]
+[ceerws1112:08177] [ 7] ../../milo(_ZN3ROL15TrustRegionStepIdE14updateGradientERNS_6VectorIdEERNS_9ObjectiveIdEERNS_15BoundConstraintIdEERNS_14AlgorithmStateIdEE+0x3f7)[0x102f427]
+[ceerws1112:08177] [ 8] ../../milo(_ZN3ROL15TrustRegionStepIdE10initializeERNS_6VectorIdEERKS3_S6_RNS_9ObjectiveIdEERNS_15BoundConstraintIdEERNS_14AlgorithmStateIdEE+0x29e)[0x10309de]
+[ceerws1112:08177] [ 9] ../../milo[0xfc31c4]
+[ceerws1112:08177] [10] ../../milo(_ZN8analysis3runEv+0x7b25)[0xfcbb05]
+[ceerws1112:08177] [11] ../../milo(main+0x1366)[0xd22c26]
+[ceerws1112:08177] [12] /lib64/libc.so.6(__libc_start_main+0x100)[0x3c8041ed20]
+[ceerws1112:08177] [13] ../../milo[0xcf72e5]
+[ceerws1112:08177] *** End of error message ***
+[ceerws1112:08176] *** Process received signal ***
+[ceerws1112:08176] Signal: Segmentation fault (11)
+[ceerws1112:08176] Signal code: Address not mapped (1)
+[ceerws1112:08176] Failing at address: (nil)
+[ceerws1112:08176] [ 0] /lib64/libpthread.so.0[0x3c8080f7e0]
+[ceerws1112:08176] [ 1] ../../milo(_ZN4cell13computeJacResERKdRKbS3_S3_S3_RKiS3_S3_S3_N6Kokkos4ViewIPPPdJNS6_6SerialEEEESC_SC_+0x1189)[0x1096ca9]
+[ceerws1112:08176] [ 2] ../../milo(_ZN15AssemblyManager14assembleJacResERN7Teuchos3RCPIN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEESC_SC_SC_RKdSE_RKbSG_SG_SC_RNS1_INS2_9CrsMatrixIdiiS9_EEEESG_SE_SG_SG_RKiSC_SG_SM_+0xb4e)[0x106955e]
+[ceerws1112:08176] [ 3] ../../milo(_ZN15AssemblyManager14assembleJacResERN7Teuchos3RCPIN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEESC_SC_SC_RKdSE_RKbSG_SG_SC_RNS1_INS2_9CrsMatrixIdiiS9_EEEESG_SE_SG_SG_RKiSC_SG_+0x133)[0x106bba3]
+[ceerws1112:08176] [ 4] ../../milo(_ZN6solver15nonlinearSolverERN7Teuchos3RCPIN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEESC_SC_SC_RKdSE_+0x6ae)[0xeff82e]
+[ceerws1112:08176] [ 5] ../../milo(_ZN6solver12adjointModelERSt6vectorIdSaIdEE+0x1dd)[0xf0309d]
+[ceerws1112:08176] [ 6] ../../milo(_ZN3ROL14Objective_MILOIdE8gradientERNS_6VectorIdEERKS3_Rd+0x214)[0x10067d4]
+[ceerws1112:08176] [ 7] ../../milo(_ZN3ROL15TrustRegionStepIdE14updateGradientERNS_6VectorIdEERNS_9ObjectiveIdEERNS_15BoundConstraintIdEERNS_14AlgorithmStateIdEE+0x3f7)[0x102f427]
+[ceerws1112:08176] [ 8] ../../milo(_ZN3ROL15TrustRegionStepIdE10initializeERNS_6VectorIdEERKS3_S6_RNS_9ObjectiveIdEERNS_15BoundConstraintIdEERNS_14AlgorithmStateIdEE+0x29e)[0x10309de]
+[ceerws1112:08176] [ 9] ../../milo[0xfc31c4]
+[ceerws1112:08176] [10] ../../milo(_ZN8analysis3runEv+0x7b25)[0xfcbb05]
+[ceerws1112:08176] [11] ../../milo(main+0x1366)[0xd22c26]
+[ceerws1112:08176] [12] /lib64/libc.so.6(__libc_start_main+0x100)[0x3c8041ed20]
+[ceerws1112:08176] [13] ../../milo[0xcf72e5]
+[ceerws1112:08176] *** End of error message ***
 --------------------------------------------------------------------------
-mpiexec noticed that process rank 1 with PID 0 on node s998638 exited on signal 6 (Abort trap: 6).
+mpiexec noticed that process rank 1 with PID 8177 on node ceerws1112 exited on signal 11 (Segmentation fault).
 --------------------------------------------------------------------------

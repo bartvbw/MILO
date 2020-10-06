@@ -13,7 +13,6 @@
 #define PHASEFIELD_H
 
 #include "physics_base.hpp"
-
 class phasefield : public physicsbase {
   public:
   
@@ -54,12 +53,12 @@ class phasefield : public physicsbase {
     // 1. basis and basis_grad already include the integration weights
     
     int resindex;
-    int numCubPoints = wkset->ip.dimension(1);
+    int numCubPoints = wkset->ip.extent(1);
     int e_basis = wkset->usebasis[e_num];
-    int numBasis = wkset->basis[e_basis].dimension(1);
+    int numBasis = wkset->basis[e_basis].extent(1);
     
-    //    int numBasis = basis.dimension(2);
-    // int numCubPoints = ip.dimension(1);
+    //    int numBasis = basis.extent(2);
+    // int numCubPoints = ip.extent(1);
     
     ScalarT x = 0.0;
     ScalarT y = 0.0;
@@ -115,12 +114,12 @@ class phasefield : public physicsbase {
     // NOTES:
     // 1. basis and basis_grad already include the integration weights
     
-    //    int numCubPoints = ip.dimension(1);
+    //    int numCubPoints = ip.extent(1);
     //  int e_basis = usebasis[e_num];
-    // int numBasis = basis[e_basis].dimension(1);
+    // int numBasis = basis[e_basis].extent(1);
     
-    //    int numBasis = basis.dimension(2);
-    // int numSideCubPoints = ip.dimension(1);
+    //    int numBasis = basis.extent(2);
+    // int numSideCubPoints = ip.extent(1);
     
     //    FCAD local_resid(1, numBasis);
     
@@ -186,7 +185,7 @@ class phasefield : public physicsbase {
     ScalarT y = 0.0;
     ScalarT z = 0.0;
     
-    for (size_t i=0; i<wkset->ip_side.dimension(1); i++) {
+    for (size_t i=0; i<wkset->ip_side.extent(1); i++) {
       x = wkset->ip_side(0,i,0);
       if (spaceDim > 1)
       y = wkset->ip_side(0,i,1);
@@ -239,7 +238,7 @@ class phasefield : public physicsbase {
   // ========================================================================================
   
   FC getInitial(const DRV & ip, const string & var, const ScalarT & time, const bool & isAdjoint) const {
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     FC initial(1,numip);
     
     string dummy ("dummy");
@@ -283,7 +282,7 @@ class phasefield : public physicsbase {
                 const FCAD & local_psoln,
                 const FCAD & local_psoln_grad,
                 const DRV & ip, const ScalarT & time) const {
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     FCAD resp(1,numip);
     for (int j=0; j<numip; j++) {
       resp(0,j) = local_soln(e_num,j,0);
@@ -297,7 +296,7 @@ class phasefield : public physicsbase {
   
   //  FCAD target(const FC & ip, const ScalarT & time) const {
   FCAD target(const FC & ip, const ScalarT & time) {
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     FCAD targ(1,numip);
     for (int j=0; j<numip; j++) {
       targ(0,j) = 1.0;
@@ -432,17 +431,17 @@ class phasefield : public physicsbase {
     ScalarT x,y,z;
     int numip;
     if (ip.rank() == 2)
-    numip = ip.dimension(0);
+    numip = ip.extent(0);
     else
-    numip = ip.dimension(1);
+    numip = ip.extent(1);
     
     FC dvals(numip);
     //FC gvals(numip);
     for (size_t i=0; i<numip; i++) {
       x = ip(i,0);
-      if (ip.dimension(1) > 1)
+      if (ip.extent(1) > 1)
       y = ip(i,1);
-      if (ip.dimension(1) > 2)
+      if (ip.extent(1) > 2)
       z = ip(i,2);
       
       dval = DiffusionCoeff(x,y,z);

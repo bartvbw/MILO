@@ -13,7 +13,6 @@
 #define SHALLOWWATER_H
 
 #include "physics_base.hpp"
-
 static void shallowwaterHelp() {
   cout << "********** Help and Documentation for the Shallow Water Physics Module **********" << endl << endl;
   cout << "Model:" << endl << endl;
@@ -121,11 +120,11 @@ public:
     
     //KokkosTools::print(bath);
     
-    parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
       ScalarT v = 0.0;
       ScalarT dvdx = 0.0;
       ScalarT dvdy = 0.0;
-      for (int k=0; k<sol.dimension(2); k++ ) {
+      for (int k=0; k<sol.extent(2); k++ ) {
       
         AD xi = sol(e,H_num,k,0);
         AD xi_dot = sol_dot(e,H_num,k,0);
@@ -137,7 +136,7 @@ public:
         AD Hv_dot = sol_dot(e,Hv_num,k,0);
         
         
-        for (int i=0; i<Hbasis.dimension(1); i++ ) {
+        for (int i=0; i<Hbasis.extent(1); i++ ) {
           
           int resindex = offsets(H_num,i);
           v = Hbasis(e,i,k);
@@ -149,7 +148,7 @@ public:
           
         }
         
-        for (int i=0; i<Hubasis.dimension(1); i++ ) {
+        for (int i=0; i<Hubasis.extent(1); i++ ) {
           
           int resindex = offsets(Hu_num,i);
           v = Hubasis(e,i,k);
@@ -161,7 +160,7 @@ public:
           
         }
         
-        for (int i=0; i<Hvbasis.dimension(1); i++ ) {
+        for (int i=0; i<Hvbasis.extent(1); i++ ) {
           
           int resindex = offsets(Hv_num,i);
           v = Hvbasis(e,i,k);
@@ -229,15 +228,15 @@ public:
     Teuchos::TimeMonitor localtime(*boundaryResidualFill);
     ScalarT bb = 1.0;
     int cside = wkset->currentside;
-    for (int e=0; e<sideinfo.dimension(0); e++) {
+    for (int e=0; e<sideinfo.extent(0); e++) {
       if (sideinfo(e,H_num,cside,0) == 2) { // Element e is on the side
-        for (int k=0; k<Hbasis.dimension(2); k++ ) {
+        for (int k=0; k<Hbasis.extent(2); k++ ) {
           AD xi = sol_side(e,H_num,k,0);
           AD H = xi + bb;//bath_side(e,k);
           AD Hu = sol_side(e,Hu_num,k,0);
           AD Hv = sol_side(e,Hv_num,k,0);
           
-          for (int i=0; i<Hbasis.dimension(1); i++ ) {
+          for (int i=0; i<Hbasis.extent(1); i++ ) {
             int resindex = offsets(H_num,i);
             ScalarT v = Hbasis(e,i,k);
             //res(e,resindex) += (Hu*normals(e,k,0)+Hv*normals(e,k,1))*v;
@@ -246,13 +245,13 @@ public:
         }
       }
       if (sideinfo(e,Hu_num,cside,0) == 2) { // Element e is on the side
-        for (int k=0; k<Hubasis.dimension(2); k++ ) {
+        for (int k=0; k<Hubasis.extent(2); k++ ) {
           AD xi = sol_side(e,H_num,k,0);
           AD H = xi + bb;//bath_side(e,k);
           AD Hu = sol_side(e,Hu_num,k,0);
           AD Hv = sol_side(e,Hv_num,k,0);
           
-          for (int i=0; i<Hubasis.dimension(1); i++ ) {
+          for (int i=0; i<Hubasis.extent(1); i++ ) {
             int resindex = offsets(Hu_num,i);
             ScalarT v = Hubasis(e,i,k);
             //res(e,resindex) += (((Hu*Hu/H + 0.5*gravity*(H*H-bb*bb)))*normals(e,k,0) + Hv*Hu/H*normals(e,k,1))*v;
@@ -261,13 +260,13 @@ public:
         }
       }
       if (sideinfo(e,Hv_num,cside,0) == 2) { // Element e is on the side
-        for (int k=0; k<Hvbasis.dimension(2); k++ ) {
+        for (int k=0; k<Hvbasis.extent(2); k++ ) {
           AD xi = sol_side(e,H_num,k,0);
           AD H = xi + bb;//bath_side(e,k);
           AD Hu = sol_side(e,Hu_num,k,0);
           AD Hv = sol_side(e,Hv_num,k,0);
           
-          for (int i=0; i<Hvbasis.dimension(1); i++ ) {
+          for (int i=0; i<Hvbasis.extent(1); i++ ) {
             int resindex = offsets(Hv_num,i);
             ScalarT v = Hvbasis(e,i,k);
             //res(e,resindex) += (((Hu*Hu/H))*normals(e,k,0) + (Hv*Hu/H + 0.5*gravity*(H*H - bb*bb))*normals(e,k,1))*v;

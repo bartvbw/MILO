@@ -1,19 +1,27 @@
-terminate called after throwing an instance of 'std::runtime_error'
-  what():  /Users/tmwilde/Desktop/MILO/src/interfaces/userInterface.hpp:177:
-
-Throw number = 1
-
-Throw test that evaluated to true: true
-
-Error: the input.xml needs to contain either a Discretization sublist or a path to a Discretization settings file!
-[s998638:22685] *** Process received signal ***
-[s998638:22685] Signal: Abort trap: 6 (6)
-[s998638:22685] Signal code:  (0)
-[s998638:22685] *** End of error message ***
--------------------------------------------------------
-Primary job  terminated normally, but 1 process returned
-a non-zero exit code. Per user-direction, the job has been aborted.
--------------------------------------------------------
+[ceerws1112:04845] *** Process received signal ***
+[ceerws1112:04845] Signal: Segmentation fault (11)
+[ceerws1112:04845] Signal code: Address not mapped (1)
+[ceerws1112:04845] Failing at address: 0xc
+[ceerws1112:04845] [ 0] /lib64/libpthread.so.0[0x3c8080f7e0]
+[ceerws1112:04845] [ 1] ../../milo(_ZN7Amesos24KLU2IN6Tpetra9CrsMatrixIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS3_6SerialENS3_9HostSpaceEEEEENS1_11MultiVectorIdiiS8_EEE25numericFactorization_implEv+0xf6)[0x20c7c86]
+[ceerws1112:04845] [ 2] ../../milo(_ZNK7Amesos210SolverCoreINS_4KLU2EN6Tpetra9CrsMatrixIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEENS2_11MultiVectorIdiiS9_EEE5solveEN7Teuchos3PtrISC_EENSF_IKSC_EE+0x346)[0x20d8946]
+[ceerws1112:04845] [ 3] ../../milo(_ZN7Amesos210SolverCoreINS_4KLU2EN6Tpetra9CrsMatrixIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEENS2_11MultiVectorIdiiS9_EEE5solveEv+0x26)[0x20b4aa6]
+[ceerws1112:04845] [ 4] ../../milo(_ZNK5MueLu15Amesos2SmootherIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS1_6SerialENS1_9HostSpaceEEEE5ApplyERN6Xpetra11MultiVectorIdiiS6_EERKSA_b+0x292)[0x187a182]
+[ceerws1112:04845] [ 5] ../../milo(_ZNK5MueLu12DirectSolverIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS1_6SerialENS1_9HostSpaceEEEE5ApplyERN6Xpetra11MultiVectorIdiiS6_EERKSA_b+0x3a)[0x16435ba]
+[ceerws1112:04845] [ 6] ../../milo(_ZN5MueLu9HierarchyIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS1_6SerialENS1_9HostSpaceEEEE7IterateERKN6Xpetra11MultiVectorIdiiS6_EERSA_NS7_8ConvDataEbi+0x25c9)[0x16b6239]
+[ceerws1112:04845] [ 7] ../../milo(_ZNK5MueLu14TpetraOperatorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS1_6SerialENS1_9HostSpaceEEEE5applyERKN6Tpetra11MultiVectorIdiiS6_EERSA_N7Teuchos7ETranspEdd+0x10c)[0x17ddb0c]
+[ceerws1112:04845] [ 8] ../../milo(_ZN5Belos13LinearProblemIdN6Tpetra11MultiVectorIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS3_6SerialENS3_9HostSpaceEEEEENS1_8OperatorIdiiS8_EEE10setProblemERKN7Teuchos3RCPIS9_EERKNSE_IKS9_EE+0x407)[0xfbd417]
+[ceerws1112:04845] [ 9] ../../milo(_ZN6solver12linearSolverERN7Teuchos3RCPIN6Tpetra9CrsMatrixIdiiN6Kokkos6Compat23KokkosDeviceWrapperNodeINS4_6SerialENS4_9HostSpaceEEEEEEERNS1_INS2_11MultiVectorIdiiS9_EEEESG_+0xa70)[0xefe530]
+[ceerws1112:04845] [10] ../../milo(_ZN6solver10setInitialEv+0x29b)[0xf00d7b]
+[ceerws1112:04845] [11] ../../milo(_ZN6solver12forwardModelERN6Sacado3Fad4DFadIdEE+0x80)[0xf02550]
+[ceerws1112:04845] [12] ../../milo(_ZN3ROL14Objective_MILOIdE5valueERKNS_6VectorIdEERd+0x128)[0x1006c68]
+[ceerws1112:04845] [13] ../../milo(_ZN3ROL15TrustRegionStepIdE10initializeERNS_6VectorIdEERKS3_S6_RNS_9ObjectiveIdEERNS_15BoundConstraintIdEERNS_14AlgorithmStateIdEE+0x260)[0x10309a0]
+[ceerws1112:04845] [14] ../../milo[0xfc31c4]
+[ceerws1112:04845] [15] ../../milo(_ZN8analysis3runEv+0x7b25)[0xfcbb05]
+[ceerws1112:04845] [16] ../../milo(main+0x1366)[0xd22c26]
+[ceerws1112:04845] [17] /lib64/libc.so.6(__libc_start_main+0x100)[0x3c8041ed20]
+[ceerws1112:04845] [18] ../../milo[0xcf72e5]
+[ceerws1112:04845] *** End of error message ***
 --------------------------------------------------------------------------
-mpiexec noticed that process rank 0 with PID 0 on node s998638 exited on signal 6 (Abort trap: 6).
+mpiexec noticed that process rank 0 with PID 4845 on node ceerws1112 exited on signal 11 (Segmentation fault).
 --------------------------------------------------------------------------

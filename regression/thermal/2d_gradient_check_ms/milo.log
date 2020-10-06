@@ -1,27 +1,26 @@
-[s998638:14483] *** Process received signal ***
-[s998638:14483] Signal: Segmentation fault: 11 (11)
-[s998638:14483] Signal code: Address not mapped (1)
-[s998638:14483] Failing at address: 0xf88
-[s998638:14484] *** Process received signal ***
-[s998638:14484] Signal: Segmentation fault: 11 (11)
-[s998638:14484] Signal code:  (0)
-[s998638:14484] Failing at address: 0x0
-[s998638:14485] *** Process received signal ***
-[s998638:14485] Signal: Segmentation fault: 11 (11)
-[s998638:14485] Signal code:  (0)
-[s998638:14485] Failing at address: 0x0
-[s998638:14482] *** Process received signal ***
-[s998638:14482] Signal: Segmentation fault: 11 (11)
-[s998638:14482] Signal code: Address not mapped (1)
-[s998638:14482] Failing at address: 0xf88
-[s998638:14482] *** End of error message ***
-[s998638:14483] *** End of error message ***
-[s998638:14484] *** End of error message ***
-[s998638:14485] *** End of error message ***
--------------------------------------------------------
-Primary job  terminated normally, but 1 process returned
-a non-zero exit code. Per user-direction, the job has been aborted.
--------------------------------------------------------
---------------------------------------------------------------------------
-mpiexec noticed that process rank 3 with PID 0 on node s998638 exited on signal 11 (Segmentation fault: 11).
---------------------------------------------------------------------------
+           Step size           grad'*dir           FD approx           abs error
+           ---------           ---------           ---------           ---------
+   1.00000000000e+00   0.00000000000e+00   8.01040354716e-02   8.01040354716e-02
+   1.00000000000e-01   0.00000000000e+00  -5.05114576740e-01   5.05114576740e-01
+   1.00000000000e-02   0.00000000000e+00  -5.63636437962e-01   5.63636437962e-01
+   1.00000000000e-03   0.00000000000e+00  -5.69488624084e-01   5.69488624084e-01
+   1.00000000000e-04   0.00000000000e+00  -5.70073842696e-01   5.70073842696e-01
+   1.00000000000e-05   0.00000000000e+00  -5.70132364555e-01   5.70132364555e-01
+   1.00000000000e-06   0.00000000000e+00  -5.70138216749e-01   5.70138216749e-01
+   1.00000000000e-07   0.00000000000e+00  -5.70138802003e-01   5.70138802003e-01
+   1.00000000000e-08   0.00000000000e+00  -5.70138859735e-01   5.70138859735e-01
+   1.00000000000e-09   0.00000000000e+00  -5.70138866673e-01   5.70138866673e-01
+   1.00000000000e-10   0.00000000000e+00  -5.70138797285e-01   5.70138797285e-01
+   1.00000000000e-11   0.00000000000e+00  -5.70138380951e-01   5.70138380951e-01
+   1.00000000000e-12   0.00000000000e+00  -5.70127278721e-01   5.70127278721e-01
+
+Truncated CG Trust-Region Solver with Limited-Memory BFGS Hessian Approximation
+  iter  value          gnorm          snorm          delta          #fval     #grad     tr_flag   iterCG    flagCG    
+  0     1.250000e-01   0.000000e+00                  1.000000e+02   
+Optimization Terminated with Status: Converged
+
+Truncated CG Trust-Region Solver with Limited-Memory BFGS Hessian Approximation
+  iter  value          gnorm          snorm          delta          #fval     #grad     tr_flag   iterCG    flagCG    
+  0     1.250000e-01   0.000000e+00                  1.000000e+02   
+Optimization Terminated with Status: Converged
+param 0 = 0

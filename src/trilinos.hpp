@@ -42,6 +42,8 @@
 #include "Tpetra_CrsMatrix.hpp"
 #include "Tpetra_Import.hpp"
 #include "Tpetra_Export.hpp"
+//bvbw
+#include "Tpetra_ConfigDefs.hpp"
 
 // Shards includes
 #include "Shards_CellTopology.hpp"

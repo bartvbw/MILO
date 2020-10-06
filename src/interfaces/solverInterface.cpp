@@ -196,7 +196,21 @@ Comm(Comm_), mesh(mesh_), disc(disc_), phys(phys_), DOF(DOF_), assembler(assembl
   /////////////////////////////////////////////////////////////////////////////
   // Tpetra maps
   /////////////////////////////////////////////////////////////////////////////
-  
+
+  //bvbw  - need to include blocks; loop over blocks and find largest maxNumEnt?
+  //  for (size_t b=0; b<blocknames.size(); b++) {
+  // Kokkos::View<GO**,HostDevice> gids = assembler->cells[b][0]->GIDs; 
+  // Kokkos::View<GO**,HostDevice> gids = assembler->cells[0][0]->GIDs; 
+  // int gidSize = gids.extent(1);
+  int b = assembler->cells.size();
+  int e = assembler->cells[b].size();
+  //bvbw
+  // int n = numVars[b-1];
+  // int numBasisSize = numBasis[b-1][n-1];
+  //bvbw  int numElem = assembler->cells[b][e]->numElem;
+  //bvbw  maxNumEntPerRow = maxDerivs*numElem*spaceDim;
+  maxNumEntPerRow = 2096;
+  //maxNumEntPerRow = 12;
   this->setupLinearAlgebra();
   
   /////////////////////////////////////////////////////////////////////////////
@@ -275,7 +289,7 @@ void solver::finalizeWorkset() {
     assembler->wkset[b]->paramusebasis = params->discretized_param_usebasis;
     assembler->wkset[b]->paramoffsets = poffsets_device;//paramoffsets;
     assembler->wkset[b]->varlist = varlist[b];
-    int numDOF = assembler->cells[b][0]->GIDs.dimension(1);
+    int numDOF = assembler->cells[b][0]->GIDs.extent(1);
     for (size_t e=0; e<assembler->cells[b].size(); e++) {
       assembler->cells[b][e]->wkset = assembler->wkset[b];
       assembler->cells[b][e]->setUseBasis(useBasis[b],nstages);
@@ -324,11 +338,11 @@ void solver::setupLinearAlgebra() {
   }
   
   const Tpetra::global_size_t INVALID = Teuchos::OrdinalTraits<Tpetra::global_size_t>::invalid ();
-  
+
   LA_owned_map = Teuchos::rcp(new LA_Map(INVALID, LA_owned, 0, Comm));
   LA_overlapped_map = Teuchos::rcp(new LA_Map(INVALID, LA_ownedAndShared, 0, Comm));
   LA_owned_graph = createCrsGraph(LA_owned_map);//Teuchos::rcp(new LA_CrsGraph(Copy, *LA_owned_map, 0));
-  LA_overlapped_graph = createCrsGraph(LA_overlapped_map);//Teuchos::rcp(new LA_CrsGraph(Copy, *LA_overlapped_map, 0));
+  LA_overlapped_graph = Tpetra::createCrsGraph(LA_overlapped_map,maxNumEntPerRow);//Teuchos::rcp(new LA_CrsGraph(Copy, *LA_overlapped_map, 0));
   
   exporter = Teuchos::rcp(new LA_Export(LA_overlapped_map, LA_owned_map));
   importer = Teuchos::rcp(new LA_Import(LA_owned_map, LA_overlapped_map));
@@ -352,7 +366,7 @@ void solver::setupLinearAlgebra() {
       int numElem = assembler->cells[b][e]->numElem;
       
       // this should fail on the first iteration through if maxDerivs is not large enough
-      TEUCHOS_TEST_FOR_EXCEPTION(gids.dimension(1) > maxDerivs,std::runtime_error,"Error: maxDerivs is not large enough to support the number of degrees of freedom per element times the number of time stages.");
+      TEUCHOS_TEST_FOR_EXCEPTION(gids.extent(1) > maxDerivs,std::runtime_error,"Error: maxDerivs is not large enough to support the number of degrees of freedom per element times the number of time stages.");
       //vector<vector<vector<int> > > cellindices;
       Kokkos::View<LO***,AssemblyDevice> cellindices("Local DOF indices", numElem, numVars[b], maxBasis[b]);
       for (int p=0; p<numElem; p++) {
@@ -366,11 +380,11 @@ void solver::setupLinearAlgebra() {
           }
           //indices.push_back(cindex);
         }
-        Teuchos::Array<GO> ind2(gids.dimension(1));
-        for (size_t i=0; i<gids.dimension(1); i++) {
+        Teuchos::Array<GO> ind2(gids.extent(1));
+        for (size_t i=0; i<gids.extent(1); i++) {
           ind2[i] = gids(p,i);
         }
-        for (size_t i=0; i<gids.dimension(1); i++) {
+        for (size_t i=0; i<gids.extent(1); i++) {
           GO ind1 = gids(p,i);
           LA_overlapped_graph->insertGlobalIndices(ind1,ind2);
         }
@@ -387,7 +401,7 @@ void solver::setupLinearAlgebra() {
         int numElem = assembler->boundaryCells[b][e]->numElem;
         
         // this should fail on the first iteration through if maxDerivs is not large enough
-        TEUCHOS_TEST_FOR_EXCEPTION(gids.dimension(1) > maxDerivs,std::runtime_error,"Error: maxDerivs is not large enough to support the number of degrees of freedom per element times the number of time stages.");
+        TEUCHOS_TEST_FOR_EXCEPTION(gids.extent(1) > maxDerivs,std::runtime_error,"Error: maxDerivs is not large enough to support the number of degrees of freedom per element times the number of time stages.");
         //vector<vector<vector<int> > > cellindices;
         Kokkos::View<LO***,AssemblyDevice> cellindices("Local DOF indices", numElem, numVars[b], maxBasis[b]);
         for (int p=0; p<numElem; p++) {
@@ -401,11 +415,11 @@ void solver::setupLinearAlgebra() {
             }
             //indices.push_back(cindex);
           }
-          Teuchos::Array<GO> ind2(gids.dimension(1));
-          for (size_t i=0; i<gids.dimension(1); i++) {
+          Teuchos::Array<GO> ind2(gids.extent(1));
+          for (size_t i=0; i<gids.extent(1); i++) {
             ind2[i] = gids(p,i);
           }
-          for (size_t i=0; i<gids.dimension(1); i++) {
+          for (size_t i=0; i<gids.extent(1); i++) {
             GO ind1 = gids(p,i);
             LA_overlapped_graph->insertGlobalIndices(ind1,ind2);
           }
@@ -906,9 +920,9 @@ DFAD solver::computeObjective(const vector_RCP & F_soln, const ScalarT & time, c
       Kokkos::View<GO**,HostDevice> paramGIDs = assembler->cells[b][e]->paramGIDs;
       int numElem = assembler->cells[b][e]->numElem;
       
-      if (obj.dimension(1) > 0) {
+      if (obj.extent(1) > 0) {
         for (int c=0; c<numElem; c++) {
-          for (size_t i=0; i<obj.dimension(1); i++) {
+          for (size_t i=0; i<obj.extent(1); i++) {
             totaldiff += obj(c,i);
             if (params->num_active_params > 0) {
               if (obj(c,i).size() > 0) {
@@ -1146,7 +1160,7 @@ void solver::computeSensitivities(vector_RCP & u, vector_RCP & u_dot,
     }
     
     vector_RCP res_over = Teuchos::rcp(new LA_MultiVector(LA_overlapped_map,1)); // reset residual
-    matrix_RCP J_over = Tpetra::createCrsMatrix<ScalarT>(params->param_overlapped_map); // reset Jacobian
+    matrix_RCP J_over = Tpetra::createCrsMatrix<ScalarT>(params->param_overlapped_map,maxNumEntPerRow); // reset Jacobian
     matrix_RCP J = Tpetra::createCrsMatrix<ScalarT>(params->param_owned_map); // reset Jacobian
     
     res_over->putScalar(0.0);
@@ -1217,7 +1231,7 @@ void solver::setDirichlet(vector_RCP & initial) {
       int fnum = DOF->getFieldNum(varlist[b][n]);
       for( size_t e=0; e<disc->myElements[b].size(); e++ ) { // loop through all the elements
         side_info = phys->getSideInfo(b,n,e);
-        int numSides = side_info.dimension(0);
+        int numSides = side_info.extent(0);
         DRV I_elemNodes;
         vector<size_t> elist(1);
         elist[0] = e;
@@ -1295,12 +1309,12 @@ vector_RCP solver::setInitial() {
   vector_RCP initial = Teuchos::rcp(new LA_MultiVector(LA_overlapped_map,1));
   vector_RCP glinitial = Teuchos::rcp(new LA_MultiVector(LA_owned_map,1));
   initial->putScalar(0.0);
-  
+
   if (initial_type == "L2-projection") {
     
     // Compute the L2 projection of the initial data into the discrete space
     vector_RCP rhs = Teuchos::rcp(new LA_MultiVector(LA_overlapped_map,1)); // reset residual
-    matrix_RCP mass = Tpetra::createCrsMatrix<ScalarT>(LA_overlapped_map); // reset Jacobian
+    matrix_RCP mass = Tpetra::createCrsMatrix<ScalarT>(LA_overlapped_map,maxNumEntPerRow); // reset Jacobian
     vector_RCP glrhs = Teuchos::rcp(new LA_MultiVector(LA_owned_map,1)); // reset residual
     matrix_RCP glmass = Tpetra::createCrsMatrix<ScalarT>(LA_owned_map); // reset Jacobian
     

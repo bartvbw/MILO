@@ -13,7 +13,6 @@
 #define POROUSHDIV_H
 
 #include "physics_base.hpp"
-
 static void porousHDIVHelp() {
   cout << "********** Help and Documentation for the Porous (HDIV) Physics Module **********" << endl << endl;
   cout << "Model:" << endl << endl;
@@ -66,15 +65,15 @@ public:
     basis_div = wkset->basis_div[u_basis];
     
     // (K^-1 u,v) - (p,div v) - src*v (src not added yet)
-    parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
       
       ScalarT vx = 0.0;
       ScalarT vy = 0.0;
       ScalarT vz = 0.0;
       ScalarT divv = 0.0;
       
-      for (int k=0; k<sol.dimension(2); k++ ) {
-        for (int i=0; i<basis.dimension(1); i++ ) {
+      for (int k=0; k<sol.extent(2); k++ ) {
+        for (int i=0; i<basis.extent(1); i++ ) {
           AD p = sol(e,pnum,k,0);
           AD ux = sol(e,unum,k,0);
           AD uy, uz;
@@ -105,10 +104,10 @@ public:
     basis = wkset->basis[p_basis];
     
     // -(div u,q) + src*q (src not added yet)
-    parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
       
-      for (int k=0; k<sol.dimension(2); k++ ) {
-        for (int i=0; i<basis.dimension(1); i++ ) {
+      for (int k=0; k<sol.extent(2); k++ ) {
+        for (int i=0; i<basis.extent(1); i++ ) {
           ScalarT v = basis(e,i,k);
           AD divu = sol_div(e,unum,k);
           int resindex = offsets(pnum,i);

@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include <iterator>
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // Add the aux basis functions at the integration points.
 // This version assumes the basis functions have been evaluated elsewhere (as in multiscale)
@@ -134,7 +133,7 @@ void BoundaryCell::computeSoln(const bool & seedu, const bool & seedudot, const 
     AD auxval;
     
     for (int e=0; e<numElem; e++) {
-      for (size_t k=0; k<auxindex.dimension(1); k++) {
+      for (size_t k=0; k<auxindex.extent(1); k++) {
         for(size_t i=0; i<numAuxDOF(k); i++ ) {
           if (seedaux) {
             auxval = AD(maxDerivs,auxoffsets[k][i],aux(e,k,i));
@@ -251,9 +250,9 @@ void BoundaryCell::updateRes(const bool & compute_sens, Kokkos::View<ScalarT***,
   Kokkos::View<AD**,AssemblyDevice> res_AD = wkset->res;
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   if (compute_sens) {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int r=0; r<local_res.dimension(2); r++) {
-        for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int r=0; r<local_res.extent(2); r++) {
+        for (int n=0; n<index.extent(1); n++) {
           for (int j=0; j<numDOF(n); j++) {
             local_res(e,offsets(n,j),r) -= res_AD(e,offsets(n,j)).fastAccessDx(r);
           }
@@ -262,8 +261,8 @@ void BoundaryCell::updateRes(const bool & compute_sens, Kokkos::View<ScalarT***,
     });
   }
   else {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int n=0; n<index.extent(1); n++) {
         for (int j=0; j<numDOF(n); j++) {
           local_res(e,offsets(n,j),0) -= res_AD(e,offsets(n,j)).val();
         }
@@ -280,9 +279,9 @@ void BoundaryCell::updateAdjointRes(const bool & compute_sens, Kokkos::View<Scal
   Kokkos::View<AD**,AssemblyDevice> res_AD = wkset->adjrhs;
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   if (compute_sens) {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.extent(0)), KOKKOS_LAMBDA (const int e ) {
       for (int r=0; r<maxDerivs; r++) {
-        for (int n=0; n<index.dimension(1); n++) {
+        for (int n=0; n<index.extent(1); n++) {
           for (int j=0; j<numDOF(n); j++) {
             local_res(e,offsets(n,j),r) -= res_AD(e,offsets(n,j)).fastAccessDx(r);
           }
@@ -291,8 +290,8 @@ void BoundaryCell::updateAdjointRes(const bool & compute_sens, Kokkos::View<Scal
     });
   }
   else {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int n=0; n<index.extent(1); n++) {
         for (int j=0; j<numDOF(n); j++) {
           local_res(e,offsets(n,j),0) -= res_AD(e,offsets(n,j)).val();
         }
@@ -312,10 +311,10 @@ void BoundaryCell::updateJac(const bool & useadjoint, Kokkos::View<ScalarT***,As
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   
   if (useadjoint) {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_J.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_J.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int n=0; n<index.extent(1); n++) {
         for (int j=0; j<numDOF(n); j++) {
-          for (int m=0; m<index.dimension(1); m++) {
+          for (int m=0; m<index.extent(1); m++) {
             for (int k=0; k<numDOF(m); k++) {
               local_J(e,offsets(m,k),offsets(n,j)) += res_AD(e,offsets(n,j)).fastAccessDx(offsets(m,k));
             }
@@ -325,10 +324,10 @@ void BoundaryCell::updateJac(const bool & useadjoint, Kokkos::View<ScalarT***,As
     });
   }
   else {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_J.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_J.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int n=0; n<index.extent(1); n++) {
         for (int j=0; j<numDOF(n); j++) {
-          for (int m=0; m<index.dimension(1); m++) {
+          for (int m=0; m<index.extent(1); m++) {
             for (int k=0; k<numDOF(m); k++) {
               local_J(e,offsets(n,j),offsets(m,k)) += res_AD(e,offsets(n,j)).fastAccessDx(offsets(m,k));
             }
@@ -349,10 +348,10 @@ void BoundaryCell::updateJacDot(const bool & useadjoint, Kokkos::View<ScalarT***
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   
   if (useadjoint) {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int n=0; n<index.extent(1); n++) {
         for (int j=0; j<numDOF(n); j++) {
-          for (int m=0; m<index.dimension(1); m++) {
+          for (int m=0; m<index.extent(1); m++) {
             for (int k=0; k<numDOF(m); k++) {
               local_Jdot(e,offsets(m,k),offsets(n,j)) += res_AD(e,offsets(n,j)).fastAccessDx(offsets(m,k));
             }
@@ -362,10 +361,10 @@ void BoundaryCell::updateJacDot(const bool & useadjoint, Kokkos::View<ScalarT***
     });
   }
   else {
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int n=0; n<index.dimension(1); n++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int n=0; n<index.extent(1); n++) {
         for (int j=0; j<numDOF(n); j++) {
-          for (int m=0; m<index.dimension(1); m++) {
+          for (int m=0; m<index.extent(1); m++) {
             for (int k=0; k<numDOF(m); k++) {
               local_Jdot(e,offsets(n,j),offsets(m,k)) += res_AD(e,offsets(n,j)).fastAccessDx(offsets(m,k));
             }
@@ -400,10 +399,10 @@ void BoundaryCell::updateParamJac(Kokkos::View<ScalarT***,AssemblyDevice> local_
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   Kokkos::View<int**,AssemblyDevice> paramoffsets = wkset->paramoffsets;
   
-  parallel_for(RangePolicy<AssemblyDevice>(0,local_J.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<index.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,local_J.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<index.extent(1); n++) {
       for (int j=0; j<numDOF(n); j++) {
-        for (int m=0; m<paramindex.dimension(1); m++) {
+        for (int m=0; m<paramindex.extent(1); m++) {
           for (int k=0; k<numParamDOF(m); k++) {
             local_J(e,offsets(n,j),paramoffsets(m,k)) += res_AD(e,offsets(n,j)).fastAccessDx(paramoffsets(m,k));
           }
@@ -423,10 +422,10 @@ void BoundaryCell::updateParamJacDot(Kokkos::View<ScalarT***,AssemblyDevice> loc
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   Kokkos::View<int**,AssemblyDevice> paramoffsets = wkset->paramoffsets;
   
-  parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<index.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<index.extent(1); n++) {
       for (int j=0; j<numDOF(n); j++) {
-        for (int m=0; m<paramindex.dimension(1); m++) {
+        for (int m=0; m<paramindex.extent(1); m++) {
           for (int k=0; k<numParamDOF(m); k++) {
             local_Jdot(e,offsets(n,j),paramoffsets(m,k)) += res_AD(e,offsets(n,j)).fastAccessDx(paramoffsets(m,k));
           }
@@ -445,10 +444,10 @@ void BoundaryCell::updateAuxJac(Kokkos::View<ScalarT***,AssemblyDevice> local_J)
   Kokkos::View<AD**,AssemblyDevice> res_AD = wkset->res;
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   
-  parallel_for(RangePolicy<AssemblyDevice>(0,local_J.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<index.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,local_J.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<index.extent(1); n++) {
       for (int j=0; j<numDOF(n); j++) {
-        for (int m=0; m<auxindex.dimension(1); m++) {
+        for (int m=0; m<auxindex.extent(1); m++) {
           for (int k=0; k<numAuxDOF(m); k++) {
             local_J(e,offsets(n,j),auxoffsets[m][k]) += res_AD(e,offsets(n,j)).fastAccessDx(auxoffsets[m][k]);
           }
@@ -467,10 +466,10 @@ void BoundaryCell::updateAuxJacDot(Kokkos::View<ScalarT***,AssemblyDevice> local
   Kokkos::View<AD**,AssemblyDevice> res_AD = wkset->res;
   Kokkos::View<int**,AssemblyDevice> offsets = wkset->offsets;
   
-  parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<index.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,local_Jdot.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<index.extent(1); n++) {
       for (int j=0; j<numDOF(n); j++) {
-        for (int m=0; m<auxindex.dimension(1); m++) {
+        for (int m=0; m<auxindex.extent(1); m++) {
           for (int k=0; k<numAuxDOF(m); k++) {
             local_Jdot(e,offsets(n,j),auxoffsets[m][k]) += res_AD(e,offsets(n,j)).fastAccessDx(auxoffsets[m][k]);
           }
@@ -613,9 +612,9 @@ void BoundaryCell::computeFlux(const vector_RCP & gl_u,
   auto du_kv = gl_du->getLocalView<HostDevice>();
   //auto params_kv = params->getLocalView<HostDevice>();
   
-  Kokkos::View<AD***,AssemblyDevice> u_AD("temp u AD",u.dimension(0),u.dimension(1),u.dimension(2));
-  Kokkos::View<AD***,AssemblyDevice> u_dot_AD("temp u AD",u.dimension(0),u.dimension(1),u.dimension(2));
-  //Kokkos::View<AD***,AssemblyDevice> param_AD("temp u AD",param.dimension(0),param.dimension(1),param.dimension(2));
+  Kokkos::View<AD***,AssemblyDevice> u_AD("temp u AD",u.extent(0),u.extent(1),u.extent(2));
+  Kokkos::View<AD***,AssemblyDevice> u_dot_AD("temp u AD",u.extent(0),u.extent(1),u.extent(2));
+  //Kokkos::View<AD***,AssemblyDevice> param_AD("temp u AD",param.extent(0),param.extent(1),param.extent(2));
   Kokkos::View<AD***,AssemblyDevice> param_AD("temp u AD",1,1,1);
   
   {
@@ -623,7 +622,7 @@ void BoundaryCell::computeFlux(const vector_RCP & gl_u,
     
     if (compute_sens) {
       for (int e=0; e<numElem; e++) {
-        for (size_t n=0; n<index.dimension(1); n++) {
+        for (size_t n=0; n<index.extent(1); n++) {
           for( size_t i=0; i<numDOF(n); i++ ) {
             u_AD(e,n,i) = AD(u_kv(index(e,n,i),0));
           }
@@ -633,7 +632,7 @@ void BoundaryCell::computeFlux(const vector_RCP & gl_u,
     else {
       size_t numDerivs = gl_du->getNumVectors();
       for (int e=0; e<numElem; e++) {
-        for (size_t n=0; n<index.dimension(1); n++) {
+        for (size_t n=0; n<index.extent(1); n++) {
           for( size_t i=0; i<numDOF(n); i++ ) {
             u_AD(e,n,i) = AD(maxDerivs, 0, u_kv(index(e,n,i),0));
             for( size_t p=0; p<numDerivs; p++ ) {
@@ -645,7 +644,7 @@ void BoundaryCell::computeFlux(const vector_RCP & gl_u,
     }
     /*
      for (int e=0; e<paramindex.size(); e++) {
-     for (size_t n=0; n<paramindex.dimension(1); n++) {
+     for (size_t n=0; n<paramindex.extent(1); n++) {
      for( size_t i=0; i<numParamDOF(n); i++ ) {
      param_AD(e,n,i) = AD(params_kv(paramindex(e,n,i),0));
      }
@@ -668,7 +667,7 @@ void BoundaryCell::computeFlux(const vector_RCP & gl_u,
     AD auxval;
     
     for (int e=0; e<numElem; e++) {
-      for (size_t k=0; k<auxindex.dimension(1); k++) {
+      for (size_t k=0; k<auxindex.extent(1); k++) {
         for(size_t i=0; i<numAuxDOF(k); i++ ) {
           auxval = AD(maxDerivs, auxoffsets[k][i], lambda(0,k,i));
           for( size_t j=0; j<numip; j++ ) {

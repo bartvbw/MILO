@@ -13,7 +13,6 @@
 #define THERMAL_H
 
 #include "physics_base.hpp"
-
 static void thermalHelp() {
   cout << "********** Help and Documentation for the Thermal Physics Module **********" << endl << endl;
   cout << "Model:" << endl << endl;
@@ -84,9 +83,9 @@ public:
     Teuchos::TimeMonitor resideval(*volumeResidualFill);
     
     if (spaceDim ==1) {
-      parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-        for (int k=0; k<sol.dimension(2); k++ ) {
-          for (int i=0; i<basis.dimension(1); i++ ) {
+      parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+        for (int k=0; k<sol.extent(2); k++ ) {
+          for (int i=0; i<basis.extent(1); i++ ) {
             resindex = offsets(e_num,i); // TMW: e_num is not on the assembly device
             res(e,resindex) += rho(e,k)*cp(e,k)*sol_dot(e,e_num,k,0)*basis(e,i,k) +
                                diff(e,k)*(sol_grad(e,e_num,k,0)*basis_grad(e,i,k,0)) -
@@ -100,9 +99,9 @@ public:
       });
     }
     else if (spaceDim == 2) {
-      parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-        for (int k=0; k<sol.dimension(2); k++ ) {
-          for (int i=0; i<basis.dimension(1); i++ ) {
+      parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+        for (int k=0; k<sol.extent(2); k++ ) {
+          for (int i=0; i<basis.extent(1); i++ ) {
             resindex = offsets(e_num,i);
             res(e,resindex) += rho(e,k)*cp(e,k)*sol_dot(e,e_num,k,0)*basis(e,i,k) +
                                diff(e,k)*(sol_grad(e,e_num,k,0)*basis_grad(e,i,k,0) +
@@ -117,9 +116,9 @@ public:
       });
     }
     else {
-      parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-        for (int k=0; k<sol.dimension(2); k++ ) {
-          for (int i=0; i<basis.dimension(1); i++ ) {
+      parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+        for (int k=0; k<sol.extent(2); k++ ) {
+          for (int i=0; i<basis.extent(1); i++ ) {
             resindex = offsets(e_num,i);
             res(e,resindex) += rho(e,k)*cp(e,k)*sol_dot(e,e_num,k,0)*basis(e,i,k) +
                                diff(e,k)*(sol_grad(e,e_num,k,0)*basis_grad(e,i,k,0) +
@@ -151,7 +150,7 @@ public:
     sidetype = bcs(e_num,cside);
     
     int e_basis_num = wkset->usebasis[e_num];
-    numBasis = wkset->basis_side[e_basis_num].dimension(1);
+    numBasis = wkset->basis_side[e_basis_num].extent(1);
     basis = wkset->basis_side[e_basis_num];
     basis_grad = wkset->basis_grad_side[e_basis_num];
     
@@ -180,10 +179,10 @@ public:
     
     Teuchos::TimeMonitor localtime(*boundaryResidualFill);
     
-    for (int e=0; e<basis.dimension(0); e++) {
+    for (int e=0; e<basis.extent(0); e++) {
       if (bcs(e_num,cside) == 2) {
-        for (int k=0; k<basis.dimension(2); k++ ) {
-          for (int i=0; i<basis.dimension(1); i++ ) {
+        for (int k=0; k<basis.extent(2); k++ ) {
+          for (int i=0; i<basis.extent(1); i++ ) {
             resindex = offsets(e_num,i);
             res(e,resindex) += -nsource(e,k)*basis(e,i,k);
           }
@@ -192,7 +191,7 @@ public:
       
       if (bcs(e_num,cside) == 4 || bcs(e_num,cside) == 5) {
         
-        for (int k=0; k<basis.dimension(2); k++ ) {
+        for (int k=0; k<basis.extent(2); k++ ) {
           
           AD eval = sol_side(e,e_num,k,0);
           AD dedx = sol_grad_side(e,e_num,k,0);
@@ -213,7 +212,7 @@ public:
             lambda = nsource(e,k);
           }
           
-          for (int i=0; i<basis.dimension(1); i++ ) {
+          for (int i=0; i<basis.extent(1); i++ ) {
             resindex = offsets(e_num,i);
             v = basis(e,i,k);
             dvdx = basis_grad(e,i,k,0);
@@ -269,7 +268,7 @@ public:
       
       for (int n=0; n<numElem; n++) {
         
-        for (size_t i=0; i<wkset->ip_side.dimension(1); i++) {
+        for (size_t i=0; i<wkset->ip_side.extent(1); i++) {
           penalty = 10.0*diff_side(n,i)/wkset->h(n);
           flux(n,e_num,i) += sf*diff_side(n,i)*sol_grad_side(n,e_num,i,0)*normals(n,i,0) +
                              penalty*(aux_side(n,e_num,i)-sol_side(n,e_num,i,0));

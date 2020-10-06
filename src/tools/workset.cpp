@@ -55,8 +55,8 @@ celltopo(topo), var_bcs(var_bcs_)  { //, timeInt(timeInt_) {
    */
   
   // Integration information
-  numip = ref_ip.dimension(0);
-  numsideip = ref_side_ip.dimension(0);
+  numip = ref_ip.extent(0);
+  numsideip = ref_side_ip.extent(0);
   numsides = celltopo->getSideCount();
   
   time_KV = Kokkos::View<ScalarT*,AssemblyDevice>("time",1);
@@ -182,7 +182,7 @@ void workset::setupBasis() {
       
       DRV basisvals_Transformed("basisvals_Transformed",numElem, numb, numip, dimension);
       
-      parallel_for(RangePolicy<AssemblyDevice>(0,basisvals_Transformed.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+      parallel_for(RangePolicy<AssemblyDevice>(0,basisvals_Transformed.extent(0)), KOKKOS_LAMBDA (const int e ) {
         for (size_t m=0; m<numb; m++) {
           for (size_t j=0; j<numip; j++) {
             for (size_t k=0; k<dimension; k++) {
@@ -213,7 +213,7 @@ void workset::setupBasis() {
       basis_pointers[i]->getValues(basisvals, ref_ip, OPERATOR_VALUE);
       
       DRV basisvals_Transformed("basisvals_Transformed", numElem, numb, numip, dimension);
-      parallel_for(RangePolicy<AssemblyDevice>(0,basisvals_Transformed.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+      parallel_for(RangePolicy<AssemblyDevice>(0,basisvals_Transformed.extent(0)), KOKKOS_LAMBDA (const int e ) {
         for (size_t m=0; m<numb; m++) {
           for (size_t j=0; j<numip; j++) {
             for (size_t k=0; k<dimension; k++) {
@@ -378,7 +378,7 @@ void workset::update(const DRV & ip_, const DRV & jacobian, const vector<vector<
     ip = ip_;
     
     
-    parallel_for(RangePolicy<AssemblyDevice>(0,ip.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,ip.extent(0)), KOKKOS_LAMBDA (const int e ) {
       for (size_t j=0; j<numip; j++) {
         for (size_t k=0; k<dimension; k++) {
           ip_KV(e,j,k) = ip(e,j,k);
@@ -390,7 +390,7 @@ void workset::update(const DRV & ip_, const DRV & jacobian, const vector<vector<
     CellTools<AssemblyDevice>::setJacobianInv(jacobInv, jacobian);
     FunctionSpaceTools<AssemblyDevice>::computeCellMeasure(wts, jacobDet, ref_wts);
     
-    parallel_for(RangePolicy<AssemblyDevice>(0,wts.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,wts.extent(0)), KOKKOS_LAMBDA (const int e ) {
       ScalarT vol = 0.0;
       for (int i=0; i<numip; i++) {
         vol += wts(e,i);
@@ -472,13 +472,13 @@ int workset::addSide(const DRV & nodes, const int & sidenum,
   // ----------------------------------------------------------
   // Need to store ip, normals, basis, basis_uw, basis_grad, basis_grad_uw, param_basis, param_basis_grad
   // ----------------------------------------------------------
-  int numBElem = nodes.dimension(0);
+  int numBElem = nodes.extent(0);
   
-  DRV bip("sip", numBElem, ref_side_ip.dimension(0), dimension);
-  DRV bijac("sijac", numBElem, ref_side_ip.dimension(0), dimension, dimension);
-  DRV bijacInv("sijac", numBElem, ref_side_ip.dimension(0), dimension, dimension);
-  DRV bwts("wts_side", numBElem, ref_side_ip.dimension(0));
-  DRV bnormals("normals", numBElem, ref_side_ip.dimension(0), dimension);
+  DRV bip("sip", numBElem, ref_side_ip.extent(0), dimension);
+  DRV bijac("sijac", numBElem, ref_side_ip.extent(0), dimension, dimension);
+  DRV bijacInv("sijac", numBElem, ref_side_ip.extent(0), dimension, dimension);
+  DRV bwts("wts_side", numBElem, ref_side_ip.extent(0));
+  DRV bnormals("normals", numBElem, ref_side_ip.extent(0), dimension);
   
   vector<DRV> cbasis, cbasis_uw, cbasis_grad, cbasis_grad_uw;
   
@@ -491,7 +491,7 @@ int workset::addSide(const DRV & nodes, const int & sidenum,
   }
   
   
-  DRV refSidePoints("refSidePoints", ref_side_ip.dimension(0), dimension);
+  DRV refSidePoints("refSidePoints", ref_side_ip.extent(0), dimension);
   
   CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, ref_side_ip,
                                                    dimension-1, localSideID(0), *celltopo);
@@ -500,7 +500,7 @@ int workset::addSide(const DRV & nodes, const int & sidenum,
   CellTools<AssemblyDevice>::mapToPhysicalFrame(bip, refSidePoints, nodes, *celltopo);
   CellTools<AssemblyDevice>::setJacobian(bijac, refSidePoints, nodes, *celltopo);
   CellTools<AssemblyDevice>::setJacobianInv(bijacInv, bijac);
-  DRV temporary_buffer("temporary_buffer",numBElem*ref_side_ip.dimension(0)*dimension*dimension);
+  DRV temporary_buffer("temporary_buffer",numBElem*ref_side_ip.extent(0)*dimension*dimension);
   
   if (dimension == 2) {
     FunctionSpaceTools<AssemblyDevice>::computeEdgeMeasure(bwts, bijac, ref_side_wts, localSideID(0),
@@ -531,8 +531,8 @@ int workset::addSide(const DRV & nodes, const int & sidenum,
   // ----------------------------------------------------------
   
   // scale the normal vector (we need unit normal...)
-  for (int e=0; e<bnormals.dimension(0); e++) {
-    for( int j=0; j<bnormals.dimension(1); j++ ) {
+  for (int e=0; e<bnormals.extent(0); e++) {
+    for( int j=0; j<bnormals.extent(1); j++ ) {
       ScalarT normalLength = 0.0;
       for (int sd=0; sd<dimension; sd++) {
         normalLength += bnormals(e,j,sd)*bnormals(e,j,sd);
@@ -655,7 +655,7 @@ void workset::updateSide(const DRV & nodes, const DRV & ip_side_, const DRV & wt
     wts_side = wts_side_;
     normals = normals_;
     
-    parallel_for(RangePolicy<AssemblyDevice>(0,normals.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,normals.extent(0)), KOKKOS_LAMBDA (const int e ) {
       for (size_t j=0; j<numsideip; j++) {
         for (size_t k=0; k<dimension; k++) {
           ip_side_KV(e,j,k) = ip_side(e,j,k);
@@ -710,7 +710,7 @@ void workset::updateSide(const int & sidenum, const int & cnum) {
     wts_side = wts_side_vec[cnum];
     normals = normals_side_vec[cnum];
     
-    parallel_for(RangePolicy<AssemblyDevice>(0,normals.dimension(0)), KOKKOS_LAMBDA (const int e ) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,normals.extent(0)), KOKKOS_LAMBDA (const int e ) {
       for (size_t j=0; j<numsideip; j++) {
         for (size_t k=0; k<dimension; k++) {
           ip_side_KV(e,j,k) = ip_side(e,j,k);
@@ -743,8 +743,8 @@ void workset::updateSide(const int & sidenum, const int & cnum) {
 
 void workset::resetResidual() {
   Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-  parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<res.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<res.extent(1); n++) {
       res(e,n) = 0.0;
     }
   });
@@ -757,8 +757,8 @@ void workset::resetResidual() {
 void workset::resetResidual(const int & numE) {
   Teuchos::TimeMonitor resettimer(*worksetResetTimer);
   
-  parallel_for(RangePolicy<AssemblyDevice>(0,res.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<res.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,res.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<res.extent(1); n++) {
       res(e,n) = 0.0;
     }
   });
@@ -770,9 +770,9 @@ void workset::resetResidual(const int & numE) {
 
 void workset::resetFlux() {
   Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-  parallel_for(RangePolicy<AssemblyDevice>(0,flux.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<flux.dimension(1); n++) {
-      for (int k=0; k<flux.dimension(2); k++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,flux.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<flux.extent(1); n++) {
+      for (int k=0; k<flux.extent(2); k++) {
         flux(e,n,k) = 0.0;
       }
     }
@@ -785,11 +785,11 @@ void workset::resetFlux() {
 
 void workset::resetAux() {
   Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-  parallel_for(RangePolicy<AssemblyDevice>(0,local_aux.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<local_aux.dimension(1); n++) {
-      for (int k=0; k<local_aux.dimension(2); k++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,local_aux.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<local_aux.extent(1); n++) {
+      for (int k=0; k<local_aux.extent(2); k++) {
         local_aux(e,n,k) = 0.0;
-        //for (int s=0; s<local_aux_grad.dimension(3); s++) {
+        //for (int s=0; s<local_aux_grad.extent(3); s++) {
         //  local_aux_grad(e,n,k,s) = 0.0;
         //}
       }
@@ -803,11 +803,11 @@ void workset::resetAux() {
 
 void workset::resetAuxSide() {
   Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-  parallel_for(RangePolicy<AssemblyDevice>(0,local_aux_side.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<local_aux_side.dimension(1); n++) {
-      for (int k=0; k<local_aux_side.dimension(2); k++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,local_aux_side.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<local_aux_side.extent(1); n++) {
+      for (int k=0; k<local_aux_side.extent(2); k++) {
         local_aux_side(e,n,k) = 0.0;
-        //for (int s=0; s<local_aux_grad_side.dimension(3); s++) {
+        //for (int s=0; s<local_aux_grad_side.extent(3); s++) {
         //  local_aux_grad_side(e,n,k,s) = 0.0;
         //}
       }
@@ -821,8 +821,8 @@ void workset::resetAuxSide() {
 
 void workset::resetAdjointRHS() {
   Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-  parallel_for(RangePolicy<AssemblyDevice>(0,adjrhs.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-    for (int n=0; n<adjrhs.dimension(1); n++) {
+  parallel_for(RangePolicy<AssemblyDevice>(0,adjrhs.extent(0)), KOKKOS_LAMBDA (const int e ) {
+    for (int n=0; n<adjrhs.extent(1); n++) {
       adjrhs(e,n) = 0.0;
     }
   });
@@ -837,10 +837,10 @@ void workset::computeSolnVolIP(Kokkos::View<ScalarT***,AssemblyDevice> u) {
   // Reset the values
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_soln.dimension(1); k++) {
-        for (int i=0; i<local_soln.dimension(2); i++) {
-          for (int s=0; s<local_soln.dimension(3); s++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_soln.extent(1); k++) {
+        for (int i=0; i<local_soln.extent(2); i++) {
+          for (int s=0; s<local_soln.extent(3); s++) {
             local_soln(e,k,i,s) = 0.0;
             local_soln_grad(e,k,i,s) = 0.0;
             local_soln_curl(e,k,i,s) = 0.0;
@@ -922,10 +922,10 @@ void workset::computeSolnVolIP(Kokkos::View<ScalarT***,AssemblyDevice> u,
   // Reset the values (may combine with next loop when parallelized)
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_soln.dimension(1); k++) {
-        for (int i=0; i<local_soln.dimension(2); i++) {
-          for (int s=0; s<local_soln.dimension(3); s++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_soln.extent(1); k++) {
+        for (int i=0; i<local_soln.extent(2); i++) {
+          for (int s=0; s<local_soln.extent(3); s++) {
             local_soln(e,k,i,s) = 0.0;
             local_soln_dot(e,k,i,s) = 0.0;
             local_soln_grad(e,k,i,s) = 0.0;
@@ -1050,11 +1050,11 @@ void workset::computeParamVolIP(Kokkos::View<ScalarT***,AssemblyDevice> param, c
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
     // Reset the values (may combine with next loop when parallelized)
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_param.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_param.dimension(1); k++) {
-        for (int i=0; i<local_param.dimension(2); i++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_param.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_param.extent(1); k++) {
+        for (int i=0; i<local_param.extent(2); i++) {
           local_param(e,k,i) = 0.0;
-          for (int s=0; s<local_param_grad.dimension(3); s++) {
+          for (int s=0; s<local_param_grad.extent(3); s++) {
             local_param_grad(e,k,i,s) = 0.0;
           }
         }
@@ -1107,10 +1107,10 @@ void workset::computeSolnSideIP(const int & side, Kokkos::View<ScalarT***,Assemb
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
     // Reset the values (may combine with next loop when parallelized)
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln_side.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_soln_side.dimension(1); k++) {
-        for (int i=0; i<local_soln_side.dimension(2); i++) {
-          for (int s=0; s<local_soln_side.dimension(3); s++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln_side.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_soln_side.extent(1); k++) {
+        for (int i=0; i<local_soln_side.extent(2); i++) {
+          for (int s=0; s<local_soln_side.extent(3); s++) {
             local_soln_side(e,k,i,s) = 0.0;
             local_soln_grad_side(e,k,i,s) = 0.0;
             //local_soln_dot_side(e,k,i,s) = 0.0;
@@ -1232,11 +1232,11 @@ void workset::computeParamSideIP(const int & side, Kokkos::View<ScalarT***,Assem
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
     // Reset the values (may combine with next loop when parallelized)
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_param_side.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_param_side.dimension(1); k++) {
-        for (int i=0; i<local_param_side.dimension(2); i++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_param_side.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_param_side.extent(1); k++) {
+        for (int i=0; i<local_param_side.extent(2); i++) {
           local_param_side(e,k,i) = 0.0;
-          for (int s=0; s<local_param_grad_side.dimension(3); s++) {
+          for (int s=0; s<local_param_grad_side.extent(3); s++) {
             local_param_grad_side(e,k,i,s) = 0.0;
           }
         }
@@ -1287,10 +1287,10 @@ void workset::computeSolnSideIP(const int & side, Kokkos::View<AD***,AssemblyDev
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
     // Reset the values (may combine with next loop when parallelized)
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln_side.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_soln_side.dimension(1); k++) {
-        for (int i=0; i<local_soln_side.dimension(2); i++) {
-          for (int s=0; s<local_soln_side.dimension(3); s++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_soln_side.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_soln_side.extent(1); k++) {
+        for (int i=0; i<local_soln_side.extent(2); i++) {
+          for (int s=0; s<local_soln_side.extent(3); s++) {
             local_soln_side(e,k,i,s) = 0.0;
             local_soln_grad_side(e,k,i,s) = 0.0;
             local_soln_dot_side(e,k,i,s) = 0.0;
@@ -1363,11 +1363,11 @@ void workset::computeSolnSideIP(const int & side, Kokkos::View<AD***,AssemblyDev
   {
     Teuchos::TimeMonitor resettimer(*worksetResetTimer);
     // Reset the values (may combine with next loop when parallelized)
-    parallel_for(RangePolicy<AssemblyDevice>(0,local_param_side.dimension(0)), KOKKOS_LAMBDA (const int e ) {
-      for (int k=0; k<local_param_side.dimension(1); k++) {
-        for (int i=0; i<local_param_side.dimension(2); i++) {
+    parallel_for(RangePolicy<AssemblyDevice>(0,local_param_side.extent(0)), KOKKOS_LAMBDA (const int e ) {
+      for (int k=0; k<local_param_side.extent(1); k++) {
+        for (int i=0; i<local_param_side.extent(2); i++) {
           local_param_side(e,k,i) = 0.0;
-          for (int s=0; s<local_param_grad_side.dimension(3); s++) {
+          for (int s=0; s<local_param_grad_side.extent(3); s++) {
             local_param_grad_side(e,k,i,s) = 0.0;
           }
         }

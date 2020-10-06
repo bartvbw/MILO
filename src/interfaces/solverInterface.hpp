@@ -173,7 +173,7 @@ public:
   
   LO numUnknowns, numUnknownsOS;
   GO globalNumUnknowns;
-  int verbosity, batchID, spaceDim, numsteps, gNLiter, milo_debug_level, MaxNLiter, time_order, liniter, kspace;
+  int verbosity, batchID, spaceDim, numsteps, gNLiter, milo_debug_level, MaxNLiter, time_order, liniter, kspace, maxNumEntPerRow;
 
   vector<GO>  owned, ownedAndShared, LA_owned, LA_ownedAndShared;
   

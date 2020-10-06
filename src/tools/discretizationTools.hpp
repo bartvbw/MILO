@@ -73,8 +73,8 @@ public:
   
   static DRV evaluateBasis(const basis_RCP & basis_pointer, const DRV & evalpts) {
     
-    int numCells = 1;//evalpts.dimension(0);
-    int numpts = evalpts.dimension(0);
+    int numCells = 1;//evalpts.extent(0);
+    int numpts = evalpts.extent(0);
     int numBasis = basis_pointer->getCardinality();
     DRV basisvals("basisvals", numBasis, numpts); 
     basis_pointer->getValues(basisvals, evalpts, OPERATOR_VALUE);
@@ -87,8 +87,8 @@ public:
   
   static Teuchos::RCP<DRV> evaluateBasisRCP(const basis_RCP & basis_pointer, const DRV & evalpts) {
     
-    int numCells = 1;//evalpts.dimension(0);
-    int numpts = evalpts.dimension(0);
+    int numCells = 1;//evalpts.extent(0);
+    int numpts = evalpts.extent(0);
     int numBasis = basis_pointer->getCardinality();
     DRV basisvals("basisvals", numBasis, numpts);
     basis_pointer->getValues(basisvals, evalpts, OPERATOR_VALUE);
@@ -107,8 +107,8 @@ public:
                               const topo_RCP & cellTopo, const int & side) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     
     DRV refSidePoints("refSidePoints", numpts, spaceDim);
     
@@ -133,8 +133,8 @@ public:
                                   const topo_RCP & cellTopo) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     int numBasis = basis_pointer->getCardinality();
     DRV basisvals("basisvals", numBasis, numpts); 
     basis_pointer->getValues(basisvals, evalpts, OPERATOR_VALUE);
@@ -159,8 +159,8 @@ public:
                                   const topo_RCP & cellTopo) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     int numBasis = basis_pointer->getCardinality();
     DRV basisvals("basisvals", numBasis, numpts);
     basis_pointer->getValues(basisvals, evalpts, OPERATOR_VALUE);
@@ -189,8 +189,8 @@ public:
                                       const topo_RCP & cellTopo, const int & side) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     DRV refSidePoints("refSidePoints",numpts, spaceDim);
     CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, evalpts, spaceDim-1, side, *cellTopo);
     
@@ -232,8 +232,8 @@ public:
                                const DRV & evalpts, const topo_RCP & cellTopo) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     int numBasis = basis_pointer->getCardinality();
     DRV basisgrads("basisgrads", numBasis, numpts, spaceDim); 
     DRV basisgrads_Transformed("basisgrads_Transformed", numCells, numBasis, numpts, spaceDim);
@@ -252,8 +252,8 @@ public:
                                const DRV & evalpts, const topo_RCP & cellTopo) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     int numBasis = basis_pointer->getCardinality();
     DRV basisgrads("basisgrads", numBasis, numpts, spaceDim);
     Teuchos::RCP<DRV> basisgrads_Transformed = Teuchos::rcp(new DRV("basisgrads_Transformed", numCells, numBasis, numpts, spaceDim));
@@ -277,8 +277,8 @@ public:
                                    const DRV & evalpts, const topo_RCP & cellTopo, const int & side) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     DRV refSidePoints("refSidePoints", numpts, spaceDim);
     CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, evalpts, spaceDim-1, side, *cellTopo);
     
@@ -309,8 +309,8 @@ public:
                                        const topo_RCP & cellTopo) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     int numBasis = basis_pointer->getCardinality();
     DRV basisgrads("basisgrads", numBasis, numpts, spaceDim); 
     DRV basisgrads_Transformed("basisgrads_Transformed", numCells, numBasis, numpts, spaceDim);
@@ -337,8 +337,8 @@ public:
                                        const topo_RCP & cellTopo) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     int numBasis = basis_pointer->getCardinality();
     DRV basisgrads("basisgrads", numBasis, numpts, spaceDim);
     DRV basisgrads_Transformed("basisgrads_Transformed", numCells, numBasis, numpts, spaceDim);
@@ -369,8 +369,8 @@ public:
                                            const topo_RCP & cellTopo, const int & side) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     DRV refSidePoints("refSidePoints", numpts, spaceDim);
     CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, evalpts, spaceDim-1, side, *cellTopo);
     
@@ -408,8 +408,8 @@ public:
                                 const topo_RCP & cellTopo, const int & side) {
     
     int numCells = 1;
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     DRV sideJacobian("sideJacobian", numCells, numpts, spaceDim, spaceDim);
     DRV refSidePoints("refSidePoints", numpts, spaceDim);
     CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, evalpts, spaceDim-1, side, *cellTopo);
@@ -442,9 +442,9 @@ public:
   static DRV getPhysicalWts(const DRV & nodes, const DRV & evalpts, const DRV & evalwts, 
                            const topo_RCP & cellTopo) {
     
-    int numCells = 1;//evalpts.dimension(0);
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numCells = 1;//evalpts.extent(0);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     DRV wts("wts", numCells,numpts);
     DRV jacobian("jacobian", numCells, numpts, spaceDim, spaceDim);
     DRV jacobDet("jacobDet", numCells, numpts);
@@ -463,9 +463,9 @@ public:
   //////////////////////////////////////////////////////////////////////////////////////
   
   static DRV getPhysicalIP(const DRV & nodes, const DRV & evalpts, const topo_RCP & cellTopo) {
-    int numCells = 1;//evalpts.dimension(0);
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1);
+    int numCells = 1;//evalpts.extent(0);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1);
     DRV ip("ip",numCells,numpts,spaceDim);
     CellTools<AssemblyDevice>::mapToPhysicalFrame(ip, evalpts, nodes, *cellTopo);
     return ip;      
@@ -477,9 +477,9 @@ public:
   
   static DRV getPhysicalSideIP(const DRV & nodes, const DRV & evalpts, 
                               const topo_RCP & cellTopo, const int & s) {
-    int numCells = 1;//evalpts.dimension(0);
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numCells = 1;//evalpts.extent(0);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     DRV ip("ip", numCells,numpts,spaceDim);
     DRV refSidePoints("refSidePoints", numpts, spaceDim);
     CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, evalpts, spaceDim-1, s, *cellTopo);
@@ -493,9 +493,9 @@ public:
   
   static DRV getPhysicalSideWts(const DRV & nodes, const DRV & evalpts, const DRV & evalwts,
                               const topo_RCP & cellTopo, const int & s) {
-    int numCells = 1;//evalpts.dimension(0);
-    int numpts = evalpts.dimension(0);
-    int spaceDim = evalpts.dimension(1)+1;
+    int numCells = 1;//evalpts.extent(0);
+    int numpts = evalpts.extent(0);
+    int spaceDim = evalpts.extent(1)+1;
     DRV ip("ip", numCells,numpts,spaceDim);
     DRV refSidePoints("refSidePoints", numpts, spaceDim);
     CellTools<AssemblyDevice>::mapToReferenceSubcell(refSidePoints, evalpts, spaceDim-1, s, *cellTopo);
@@ -521,8 +521,8 @@ public:
   static ScalarT getElementSize(const DRV & nodes, const DRV & ip, const DRV & wts,
                                const topo_RCP & cellTopo) {
     
-    int numip = ip.dimension(0);
-    int spaceDim = ip.dimension(1);
+    int numip = ip.extent(0);
+    int spaceDim = ip.extent(1);
     DRV jacobian("jacobian", 1, numip, spaceDim, spaceDim);
     DRV jacobDet("jacobDet", 1, numip);
     DRV weightedMeasure("weightedMeasure", 1, numip);

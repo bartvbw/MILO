@@ -15,7 +15,6 @@
 #include "trilinos.hpp"
 #include "preferences.hpp"
 
-
 class SubGridTools {
 public:
   
@@ -28,7 +27,7 @@ public:
                const string & subshape_, const DRV nodes_, Kokkos::View<int****,HostDevice> sideinfo_) :
   LocalComm(LocalComm_), shape(shape_), subshape(subshape_), nodes(nodes_), sideinfo(sideinfo_) {
     
-    dimension = nodes.dimension(2);
+    dimension = nodes.extent(2);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +38,7 @@ public:
     
     if (subshape == shape) {
       vector<int> newconn;
-      for (int i=0; i<nodes.dimension(1); i++) {
+      for (int i=0; i<nodes.extent(1); i++) {
         vector<ScalarT> newnode;
         for (int s=0; s<dimension; s++) {
           newnode.push_back(nodes(0,i,s));
@@ -49,9 +48,9 @@ public:
       }
       subconnectivity.push_back(newconn);
       
-      Kokkos::View<int****,AssemblyDevice> newsi("newsi",1,sideinfo.dimension(1),sideinfo.dimension(2),2);
-      for (size_t n=0; n<sideinfo.dimension(1); n++) {
-        for (size_t s=0; s<sideinfo.dimension(2); s++) {
+      Kokkos::View<int****,AssemblyDevice> newsi("newsi",1,sideinfo.extent(1),sideinfo.extent(2),2);
+      for (size_t n=0; n<sideinfo.extent(1); n++) {
+        for (size_t s=0; s<sideinfo.extent(2); s++) {
           if (sideinfo(0,n,s,0) > 0) {
             newsi(0,n,s,0) = sideinfo(0,n,s,0);
             newsi(0,n,s,1) = sideinfo(0,n,s,1);
@@ -72,7 +71,7 @@ public:
       else if (dimension == 2) {
         if (shape == "quad" && subshape == "tri") {
           vector<int> newconn0, newconn1, newconn2, newconn3;
-          for (int i=0; i<nodes.dimension(1); i++) {
+          for (int i=0; i<nodes.extent(1); i++) {
             vector<ScalarT> newnode;
             for (int s=0; s<dimension; s++) {
               newnode.push_back(nodes(0,i,s));
@@ -104,12 +103,12 @@ public:
           newconn3.push_back(4);
           subconnectivity.push_back(newconn3);
           
-          Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,sideinfo.dimension(1),3,2);
-          Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,sideinfo.dimension(1),3,2);
-          Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,sideinfo.dimension(1),3,2);
-          Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,sideinfo.dimension(1),3,2);
+          Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,sideinfo.extent(1),3,2);
+          Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,sideinfo.extent(1),3,2);
+          Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,sideinfo.extent(1),3,2);
+          Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,sideinfo.extent(1),3,2);
           
-          for (size_t n=0; n<sideinfo.dimension(1); n++) {
+          for (size_t n=0; n<sideinfo.extent(1); n++) {
             
             newsi0(0,n,0,0) = 1;
             if (sideinfo(0,n,0,0) > 0)
@@ -142,7 +141,7 @@ public:
         }
         else if (shape == "tri" && subshape == "quad") {
           vector<int> newconn0, newconn1, newconn2;
-          for (int i=0; i<nodes.dimension(1); i++) {
+          for (int i=0; i<nodes.extent(1); i++) {
             vector<ScalarT> newnode;
             
             for (int s=0; s<dimension; s++) {
@@ -182,11 +181,11 @@ public:
           newconn2.push_back(5);
           subconnectivity.push_back(newconn2);
           
-          Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,sideinfo.dimension(1),4,2);
-          Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,sideinfo.dimension(1),4,2);
-          Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,sideinfo.dimension(1),4,2);
+          Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,sideinfo.extent(1),4,2);
+          Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,sideinfo.extent(1),4,2);
+          Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,sideinfo.extent(1),4,2);
           
-          for (size_t n=0; n<sideinfo.dimension(1); n++) {
+          for (size_t n=0; n<sideinfo.extent(1); n++) {
             
             newsi0(0,n,0,0) = 1;
             if (sideinfo(0,n,0,0) > 0)
@@ -276,12 +275,12 @@ public:
       
       
       Kokkos::View<int****,AssemblyDevice> oldsi = subsideinfo[e];
-      Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.dimension(1),2,2);
-      Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.dimension(1),2,2);
+      Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.extent(1),2,2);
+      Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.extent(1),2,2);
       Kokkos::deep_copy(newsi0,oldsi);
       Kokkos::deep_copy(newsi1,oldsi);
       
-      for (int n=0; n<oldsi.dimension(1); n++) {
+      for (int n=0; n<oldsi.extent(1); n++) {
         newsi0(0,n,1,0) = 0;
         newsi0(0,n,1,1) = 0;
         newsi1(0,n,0,0) = 0;
@@ -356,16 +355,16 @@ public:
         
         
         Kokkos::View<int****,AssemblyDevice> oldsi = subsideinfo[e];
-        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.dimension(1),3,2);
-        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.dimension(1),3,2);
-        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.dimension(1),3,2);
-        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.dimension(1),3,2);
+        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.extent(1),3,2);
+        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.extent(1),3,2);
+        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.extent(1),3,2);
+        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.extent(1),3,2);
         Kokkos::deep_copy(newsi0,oldsi);
         Kokkos::deep_copy(newsi1,oldsi);
         Kokkos::deep_copy(newsi2,oldsi);
         Kokkos::deep_copy(newsi3,oldsi);
         
-        for (int n=0; n<oldsi.dimension(1); n++) {
+        for (int n=0; n<oldsi.extent(1); n++) {
           newsi0(0,n,1,0) = 0;
           newsi0(0,n,1,1) = 0;
           newsi1(0,n,1,0) = 0;
@@ -471,16 +470,16 @@ public:
         
         
         Kokkos::View<int****,AssemblyDevice> oldsi = subsideinfo[e];
-        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.dimension(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.extent(1),4,2);
         Kokkos::deep_copy(newsi0,oldsi);
         Kokkos::deep_copy(newsi1,oldsi);
         Kokkos::deep_copy(newsi2,oldsi);
         Kokkos::deep_copy(newsi3,oldsi);
         
-        for (int n=0; n<oldsi.dimension(1); n++) {
+        for (int n=0; n<oldsi.extent(1); n++) {
           newsi0(0,n,1,0) = 0;
           newsi0(0,n,1,1) = 0;
           newsi0(0,n,2,0) = 0;
@@ -635,14 +634,14 @@ public:
         subconnectivity.push_back(elem7);
         
         Kokkos::View<int****,AssemblyDevice> oldsi = subsideinfo[e];
-        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi4("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi5("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi6("newsi",1,oldsi.dimension(1),4,2);
-        Kokkos::View<int****,AssemblyDevice> newsi7("newsi",1,oldsi.dimension(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi4("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi5("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi6("newsi",1,oldsi.extent(1),4,2);
+        Kokkos::View<int****,AssemblyDevice> newsi7("newsi",1,oldsi.extent(1),4,2);
         
         Kokkos::deep_copy(newsi0,oldsi);
         Kokkos::deep_copy(newsi1,oldsi);
@@ -653,7 +652,7 @@ public:
         Kokkos::deep_copy(newsi6,oldsi);
         Kokkos::deep_copy(newsi7,oldsi);
         
-        for (int n=0; n<oldsi.dimension(1); n++) {
+        for (int n=0; n<oldsi.extent(1); n++) {
           newsi0(0,n,2,0) = 0;
           newsi0(0,n,2,1) = 0;
           newsi1(0,n,2,0) = 0;
@@ -975,14 +974,14 @@ public:
         subconnectivity.push_back(elem7);
         
         Kokkos::View<int****,AssemblyDevice> oldsi = subsideinfo[e];
-        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi4("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi5("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi6("newsi",1,oldsi.dimension(1),6,2);
-        Kokkos::View<int****,AssemblyDevice> newsi7("newsi",1,oldsi.dimension(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi0("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi1("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi2("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi3("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi4("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi5("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi6("newsi",1,oldsi.extent(1),6,2);
+        Kokkos::View<int****,AssemblyDevice> newsi7("newsi",1,oldsi.extent(1),6,2);
         
         Kokkos::deep_copy(newsi0,oldsi);
         Kokkos::deep_copy(newsi1,oldsi);
@@ -995,7 +994,7 @@ public:
         
         // order = 0145, 1256, 2367, 0367, 0123, 4567
         // order = bottom, right, top, left, back, front
-        for (int n=0; n<oldsi.dimension(1); n++) {
+        for (int n=0; n<oldsi.extent(1); n++) {
           newsi0(0,n,1,0) = 0;
           newsi0(0,n,1,1) = 0;
           newsi0(0,n,2,0) = 0;
@@ -1113,11 +1112,11 @@ public:
   
   Kokkos::View<int****,HostDevice> getSubSideinfo() {
     Kokkos::View<int****,HostDevice> ksubsideinfo("subgrid side info",subsideinfo.size(),
-                                                  sideinfo.dimension(1),sideinfo.dimension(2),2);
-    for (int e=0; e<ksubsideinfo.dimension(0); e++) {
-      for (int i=0; i<ksubsideinfo.dimension(1); i++) {
-        for (int j=0; j<ksubsideinfo.dimension(2); j++) {
-          for (int k=0; k<ksubsideinfo.dimension(3); k++) {
+                                                  sideinfo.extent(1),sideinfo.extent(2),2);
+    for (int e=0; e<ksubsideinfo.extent(0); e++) {
+      for (int i=0; i<ksubsideinfo.extent(1); i++) {
+        for (int j=0; j<ksubsideinfo.extent(2); j++) {
+          for (int k=0; k<ksubsideinfo.extent(3); k++) {
             ksubsideinfo(e,i,j,k) = subsideinfo[e](0,i,j,k);
           }
         }

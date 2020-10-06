@@ -16,7 +16,6 @@
 #include <random>
 #include <math.h>
 #include <time.h>
-
 static void msphasefieldHelp() {
   cout << "********** Help and Documentation for the Multi-species Phase Field Physics Module **********" << endl << endl;
   cout << "Model:" << endl << endl;
@@ -203,9 +202,9 @@ public:
     
     int resindex;
     
-    int numCubPoints = wkset->ip.dimension(1);
+    int numCubPoints = wkset->ip.extent(1);
     int phi_basis = wkset->usebasis[phi_num[0]];
-    int numBasis = wkset->basis[phi_basis].dimension(1);
+    int numBasis = wkset->basis[phi_basis].extent(1);
     
     // FCAD local_resid(numphases, numBasis);
     
@@ -236,7 +235,7 @@ public:
     res = wkset->res;
     
     for (size_t e=0; e<numElem; e++) {
-      for( int k=0; k<ip.dimension(1); k++ ) {
+      for( int k=0; k<ip.extent(1); k++ ) {
         x = ip(e,k,0);
         
         sumphi = 0.0;
@@ -278,7 +277,7 @@ public:
           }
         }
         
-        for( int i=0; i<basis.dimension(1); i++ ) {
+        for( int i=0; i<basis.extent(1); i++ ) {
           v = basis(e,i,k);
           dvdx = basis_grad(e,i,k,0);
           dvdy = basis_grad(e,i,k,1);
@@ -326,9 +325,9 @@ public:
     // NOTES:
     // 1. basis and basis_grad already include the integration weights
     
-    //    int numCubPoints = ip.dimension(1);
+    //    int numCubPoints = ip.extent(1);
     // int phi_basis = usebasis[phi_num];
-    // int numBasis = basis[phi_basis].dimension(1);
+    // int numBasis = basis[phi_basis].extent(1);
     
     //    FCAD local_resid(numphases, numBasis);
     
@@ -396,7 +395,7 @@ public:
     ScalarT z = 0.0;
     
     for (size_t e=0; e<numElem; e++) {
-      for (size_t i=0; i<wkset->ip_side.dimension(1); i++) {
+      for (size_t i=0; i<wkset->ip_side.extent(1); i++) {
         x = wkset->ip_side(e,i,0);
         if (spaceDim > 1)
           y = wkset->ip_side(e,i,1);
@@ -651,7 +650,7 @@ public:
   Kokkos::View<ScalarT**,AssemblyDevice> getInitial(const DRV & ip, const string & var,
                                                      const ScalarT & time, const bool & isAdjoint) const {
       
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     Kokkos::View<ScalarT**,AssemblyDevice> initial("initial",numElem,numip);
     
     string dummy ("dummy");
@@ -725,7 +724,7 @@ public:
                                               Kokkos::View<AD***,AssemblyDevice> local_psoln,
                                               Kokkos::View<AD****,AssemblyDevice> local_psoln_grad,
                                               const DRV & ip, const ScalarT & time) {
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     Kokkos::View<AD***,AssemblyDevice> resp("response",numElem,1,numip);
     
     for (size_t e=0; e<numElem; e++) {
@@ -741,7 +740,7 @@ public:
   // ========================================================================================
   
   Kokkos::View<AD***,AssemblyDevice> target(const DRV & ip, const ScalarT & time) {
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     Kokkos::View<AD***,AssemblyDevice> targ("target",numElem,1,numip);
     for (size_t e=0; e<numElem; e++) {
       for (int j=0; j<numip; j++) {
@@ -832,7 +831,7 @@ public:
     std::vector<AD>  phi;
     AD dval;
     AD phiInterface;
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     
     Kokkos::View<ScalarT***,AssemblyDevice> dvals("dvals",numElem,1,numip);
     for (size_t e=0; e<numElem; e++) {
@@ -858,7 +857,7 @@ public:
     std::vector<AD>  phi;
     AD dval;
     AD phiInterface;
-    int numip = ip.dimension(1);
+    int numip = ip.extent(1);
     
     Kokkos::View<ScalarT***,AssemblyDevice> dvals("dvals",numElem,1,numip);
     for (size_t e=0; e<numElem; e++) {
