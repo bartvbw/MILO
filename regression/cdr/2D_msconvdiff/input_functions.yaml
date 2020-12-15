@@ -1,0 +1,14 @@
+%YAML 1.1
+---
+ANONYMOUS:
+  Functions: 
+    source: '0.0'
+    xvel: '100.0*(1.0-4.0*y*y)'
+    yvel: '0.0'
+    ca_reaction: '100.0*ca'
+    cb_reaction: '-100.0*ca'
+    xdiffusion: '1.0'
+    ydiffusion: '1.0'
+    SUPG tau: '0.5'
+    bubble: '-10.0*(x-0.2)*(x-0.2) - 10.0*(y-0.5)*(y-0.5)'
+...

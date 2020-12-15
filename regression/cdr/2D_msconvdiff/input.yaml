@@ -1,0 +1,57 @@
+%YAML 1.1
+---
+ANONYMOUS:
+  verbosity: 3
+  debug level: 0
+  Mesh Settings File: input_mesh.yaml
+  Functions Settings File: input_functions.yaml
+  Physics: 
+    solve_msconvdiff: true
+    Dirichlet conditions:
+      ca:
+        left : '1.0'
+      cb:
+        left : '1.0'
+    Neumann conditions:
+      ca:
+        top : '-1.0+ca'
+        bottom : '1.0-ca'
+        right : '0.0'
+      cb:
+        top : '-1.0+cb'
+        bottom : '1.0-cb'
+        right : '0.0'
+    initial conditions:
+     ca: '1.0'
+     cb: '1.0'
+    true solutions:
+      ca: sin(2*pi*x)*sin(2*pi*y)
+  Discretization:
+    order:
+      ca: 1
+      cb: 1
+    quadrature: 2
+  Parameters Settings File: input_params.yaml
+  Solver: 
+    solver: transient
+    Workset size: 40
+    Verbosity: 1
+    NLtol: 9.99999999999999955e-07
+    MaxNLiter: 10
+    final time: 0.50000000000000000e-1
+    delta t: 1.0000000000000000e-2
+    use strong DBCs: true
+  Analysis: 
+    analysis type: forward
+    Have Sensor Points: false
+    Have Sensor Data: false
+  Postprocess: 
+    response type: global
+    Error type: L2
+    Verbosity: 1
+    verification: false
+    compute response: false
+    compute objective: false
+    compute sensitivities: false
+    write solution: false
+...
