@@ -71,6 +71,8 @@ settings(settings_), Commptr(Commptr_) {
   if (spaceDim == 1) {
     //Sh_cellTopo = shards::CellTopology(shards::getCellTopologyData<shards::Line<> >() );// lin. cell topology on the interior
     //Sh_sideTopo = shards::CellTopology(shards::getCellTopologyData<shards::Node<> >() );          // line cell topology on the boundary
+    cTopo = shards::CellTopology(shards::getCellTopologyData<shards::Particle>() );          // line cell topology on the boundary
+    sTopo = shards::CellTopology(shards::getCellTopologyData<shards::Particle>() );          // line cell topology on the boundary
   }
   if (spaceDim == 2) {
     if (shape == "quad") {
@@ -120,11 +122,15 @@ settings(settings_), Commptr(Commptr_) {
     pl->set("File Name",settings->sublist("Mesh").get<std::string>("Mesh_File","mesh.pmg"));
   }
   else {
-    pl->set("X Blocks",settings->sublist("Mesh").get("Xblocks",1));
-    pl->set("X Elements",settings->sublist("Mesh").get("NX",20));
+    //    pl->set("X Blocks",settings->sublist("Mesh").get("Xblocks",1));
+    // pl->set("X Elements",settings->sublist("Mesh").get("NX",20));
+    // pl->set("X0",settings->sublist("Mesh").get("xmin",0.0));
+    //  pl->set("Xf",settings->sublist("Mesh").get("xmax",1.0));
+    // pl->set("X Procs", settings->sublist("Mesh").get("Xprocs",Commptr->getSize()));
     pl->set("X0",settings->sublist("Mesh").get("xmin",0.0));
     pl->set("Xf",settings->sublist("Mesh").get("xmax",1.0));
-    pl->set("X Procs", settings->sublist("Mesh").get("Xprocs",Commptr->getSize()));
+    pl->set("X Blocks",settings->sublist("Mesh").get("Xblocks",1));
+    pl->set("X Elements",settings->sublist("Mesh").get("NX",20));
     if (spaceDim > 1) {
       pl->set("Y Blocks",settings->sublist("Mesh").get("Yblocks",1));
       pl->set("Y Elements",settings->sublist("Mesh").get("NY",20));
@@ -178,6 +184,7 @@ settings(settings_), Commptr(Commptr_) {
     string shape = cellTopo->getName();
     if (spaceDim == 1) {
       // nothing to do here?
+        sideTopo.push_back(Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Particle>() )));
     }
     if (spaceDim == 2) {
       if (shape == "Quadrilateral_4") {
@@ -268,6 +275,7 @@ settings(settings_), Commptr(Commptr_), mesh_factory(mesh_factory_), mesh(mesh_)
     string shape = cellTopo->getName();
     if (spaceDim == 1) {
       // nothing to do here?
+      sideTopo.push_back(Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Particle>() )));
     }
     if (spaceDim == 2) {
       if (shape == "Quadrilateral_4") {

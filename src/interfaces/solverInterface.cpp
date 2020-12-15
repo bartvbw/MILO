@@ -301,17 +301,19 @@ void solver::finalizeWorkset() {
     assembler->wkset[b]->params_AD = params->paramvals_KVAD;
     assembler->wkset[b]->paramnames = params->paramnames;
     //assembler->wkset[b]->setupParamBasis(discretized_param_basis);
-    
-    if (assembler->boundaryCells.size() > b) { // avoid seg faults
-      for (size_t e=0; e<assembler->boundaryCells[b].size(); e++) {
-        if (assembler->boundaryCells[b][e]->numElem > 0) {
-          assembler->boundaryCells[b][e]->wkset = assembler->wkset[b];
-          assembler->boundaryCells[b][e]->setUseBasis(useBasis[b],nstages);
-          
-          assembler->boundaryCells[b][e]->wksetBID = assembler->wkset[b]->addSide(assembler->boundaryCells[b][e]->nodes,
-                                                                                  assembler->boundaryCells[b][e]->sidenum,
-                                                                                  assembler->boundaryCells[b][e]->localSideID);
-        }
+
+    if(spaceDim > 1) {    
+      if (assembler->boundaryCells.size() > b) { // avoid seg faults
+	for (size_t e=0; e<assembler->boundaryCells[b].size(); e++) {
+	  if (assembler->boundaryCells[b][e]->numElem > 0) {
+	    assembler->boundaryCells[b][e]->wkset = assembler->wkset[b];
+	    assembler->boundaryCells[b][e]->setUseBasis(useBasis[b],nstages);
+	    
+	    assembler->boundaryCells[b][e]->wksetBID = assembler->wkset[b]->addSide(assembler->boundaryCells[b][e]->nodes,
+										    assembler->boundaryCells[b][e]->sidenum,
+										    assembler->boundaryCells[b][e]->localSideID);
+	  }
+	}
       }
     }
   }

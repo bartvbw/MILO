@@ -24,7 +24,7 @@
 #include "twophasePoNo.hpp"
 #include "twophasePoPw.hpp"
 #include "cdr.hpp"
-//#include "msconvdiff.hpp"
+#include "msconvdiff.hpp"
 #include "thermal.hpp"
 
 //#include "thermal_fr.hpp"
@@ -109,11 +109,16 @@ Commptr(Comm_), functionManager(functionManager_) {
     numip = qwts.extent(0);
     
     DRV side_qpts, side_qwts;
+
     int side_quadorder = blockdiscsettings.sublist(currblock).get<int>("side quadrature",2);
     
-    DiscTools::getQuadrature(sideTopo[b], side_quadorder, side_qpts, side_qwts);
-    numip_side = side_qwts.extent(0);
-    
+    if(spaceDim == 1) {
+      numip_side = 0;
+    } else {
+      DiscTools::getQuadrature(sideTopo[b], side_quadorder, side_qpts, side_qwts);
+      numip_side = side_qwts.extent(0);
+    }
+
     this->importPhysics(settings, blocksettings, blockdiscsettings, currorders, currtypes, currvarlist,
                         currvarowned, useScalarFunc, numip, numip_side, b);
     
@@ -430,13 +435,17 @@ void physics::importPhysics(Teuchos::RCP<Teuchos::ParameterList> & settings, Teu
     currSubgrid.push_back(currsettings.get<bool>("subgrid_cdr",false));
   }
   
-  /* not setting up correctly
+  //  not setting up correctly
    // Multiple Species convection diffusion reaction
-   if (currsettings.get<bool>("solve_msconvdiff",false)) {
-     //currmodules.push_back(msconvdiff_RCP);
-   }
-   */
   
+   if (currsettings.get<bool>("solve_msconvdiff",false)) {
+    Teuchos::RCP<msconvdiff> msconvdiff_RCP = Teuchos::rcp(new msconvdiff(settings, numip, numip_side,
+                                                    numElemPerCell, functionManager, blocknum) );
+    currmodules.push_back(msconvdiff_RCP);
+    currSubgrid.push_back(currsettings.get<bool>("subgrid_msconvdiff",false));
+   }
+  
+
   // Thermal
   if (currsettings.get<bool>("solve_thermal",false)) {
     Teuchos::RCP<thermal> thermal_RCP = Teuchos::rcp(new thermal(settings, numip,

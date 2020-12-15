@@ -123,7 +123,9 @@ Commptr(Comm_) {
     
     int sideDim = spaceDim-1;
     if (spaceDim == 1) {
-      //sideTopo = Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Node<> >() ));
+      if (shape == "line") {
+	sideTopo = Teuchos::rcp(new shards::CellTopology(shards::getCellTopologyData<shards::Particle>() ));
+      }
     }
     if (spaceDim == 2) {
       if (shape == "quad") {
@@ -144,7 +146,9 @@ Commptr(Comm_) {
     
     DRV side_qpts, side_qwts;
     int side_quadorder = db_settings.sublist(blockID).get<int>("side quadrature",mxorder+1);
-    DiscTools::getQuadrature(sideTopo, side_quadorder, side_qpts, side_qwts);
+
+    if(spaceDim > 1) 
+      DiscTools::getQuadrature(sideTopo, side_quadorder, side_qpts, side_qwts);
     
     ///////////////////////////////////////////////////////////////////////////
     // Store locally
