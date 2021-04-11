@@ -21,7 +21,7 @@ using Kokkos::RangePolicy;
 
 typedef double ScalarT;
 typedef int LO;
-typedef int GO;
+typedef long long int GO;
 
 #define maxDerivs 64 // adjust this to improve performance
 #define PI 3.141592653589793238463

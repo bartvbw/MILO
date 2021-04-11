@@ -84,8 +84,8 @@ public:
   
   Teuchos::RCP<LA_MpiComm> LocalComm;
   //bvbw  Teuchos::RCP<SolutionStorage<LA_MultiVector> > soln, solndot, adjsoln;
-  Teuchos::RCP<SolutionStorage<LA_MultiVector> > solndot, adjsoln;
-  Teuchos::RCP<SolutionStorage<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > > soln;
+  Teuchos::RCP<SolutionStorage<LA_MultiVector> > soln, solndot, adjsoln;
+  //Teuchos::RCP<SolutionStorage<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > > soln;
   
   bool useMachineLearning = false;
   
@@ -100,13 +100,13 @@ public:
   ScalarT cost_estimate;
   
   //bvbw  Teuchos::RCP<const LA_Map> owned_map, overlapped_map;
-  Teuchos::RCP<const Tpetra::Map<LO, int, HostNode> > owned_map, overlapped_map;
+  Teuchos::RCP<const Tpetra::Map<LO, GO, HostNode> > owned_map, overlapped_map;
   //bvbw Teuchos::RCP<LA_CrsGraph> owned_graph, overlapped_graph;
   Teuchos::RCP<LA_CrsGraph> owned_graph;
-  Teuchos::RCP<Tpetra::CrsGraph<LO,int,HostNode> > overlapped_graph;
+  Teuchos::RCP<Tpetra::CrsGraph<LO,GO,HostNode> > overlapped_graph;
   
   //bvbw  Teuchos::RCP<LA_Export> exporter;
-  Teuchos::RCP<Tpetra::Export<LO, int, HostNode> > exporter;
+  Teuchos::RCP<Tpetra::Export<LO, GO, HostNode> > exporter;
   Teuchos::RCP<LA_Import> importer;
   
   vector<Teuchos::RCP<vector<AD> > > paramvals_AD;

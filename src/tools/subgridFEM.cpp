@@ -520,7 +520,7 @@ int SubGridFEM::addMacro(const DRV macronodes_, Kokkos::View<int****,HostDevice>
     
     // Need to create LA versions of these maps
     
-    vector<int> params;
+    vector<GO> params;
     if (sub_params->paramOwnedAndShared.size() == 0) {
       params.push_back(0);
     }
@@ -1504,9 +1504,9 @@ void SubGridFEM::subGridNonlinearSolver(Teuchos::RCP<LA_MultiVector> & sub_u,
         Kokkos::View<GO**,HostDevice> GIDs = cells[usernum][e]->GIDs;
         for (int i=0; i<GIDs.extent(0); i++) {
           Teuchos::Array<ScalarT> vals(GIDs.extent(1));
-          Teuchos::Array<LO> cols(GIDs.extent(1));
+          Teuchos::Array<GO> cols(GIDs.extent(1));
           for( size_t row=0; row<GIDs.extent(1); row++ ) {
-            int rowIndex = GIDs(i,row);
+            GO rowIndex = GIDs(i,row);
             ScalarT val = local_res(i,row,0);
             res_over->sumIntoGlobalValue(rowIndex,0, val);
             for( size_t col=0; col<GIDs.extent(1); col++ ) {
@@ -1560,9 +1560,9 @@ void SubGridFEM::subGridNonlinearSolver(Teuchos::RCP<LA_MultiVector> & sub_u,
           Kokkos::View<GO**,HostDevice> GIDs = boundaryCells[usernum][e]->GIDs;
           for (int i=0; i<GIDs.extent(0); i++) {
             Teuchos::Array<ScalarT> vals(GIDs.extent(1));
-            Teuchos::Array<LO> cols(GIDs.extent(1));
+            Teuchos::Array<GO> cols(GIDs.extent(1));
             for( size_t row=0; row<GIDs.extent(1); row++ ) {
-              int rowIndex = GIDs(i,row);
+              GO rowIndex = GIDs(i,row);
               ScalarT val = local_res(i,row,0);
               res_over->sumIntoGlobalValue(rowIndex,0, val);
               for( size_t col=0; col<GIDs.extent(1); col++ ) {
@@ -2608,9 +2608,9 @@ Teuchos::RCP<LA_CrsMatrix>  SubGridFEM::getProjectionMatrix() {
     Kokkos::View<ScalarT***,AssemblyDevice> localmass = cells[usernum][e]->getMass();
     for (int c=0; c<numElem; c++) {
       for( size_t row=0; row<GIDs.extent(1); row++ ) {
-        int rowIndex = GIDs(c,row);
+        GO rowIndex = GIDs(c,row);
         for( size_t col=0; col<GIDs.extent(1); col++ ) {
-          int colIndex = GIDs(c,col);
+          GO colIndex = GIDs(c,col);
           ScalarT val = localmass(c,row,col);
           mass->insertGlobalValues(rowIndex, 1, &val, &colIndex);
         }

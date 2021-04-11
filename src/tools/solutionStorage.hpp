@@ -195,19 +195,24 @@ public:
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////
 
-  Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > copyData(vector_RCP & src) {
+  
+  Teuchos::RCP<V> copyData(Teuchos::RCP<V> & src) {
     
-    vector_RCP dest = Teuchos::rcp( new LA_MultiVector(src->getMap(),1));
+    typedef typename HostNode::device_type V_device;
     
-    auto src_kv = src->getLocalView<HostDevice>();
-    auto dest_kv = dest->getLocalView<HostDevice>();
+    Teuchos::RCP<V> dest = Teuchos::rcp( new V(src->getMap(),1));
+    
+    auto src_kv = src->template getLocalView<V_device>();
+    auto dest_kv = dest->template getLocalView<V_device>();
     for (size_t i=0; i<src_kv.extent(0); i++) {
       for (size_t j=0; j<src_kv.extent(1); j++) {
         dest_kv(i,j) = src_kv(i,j);
       }
     }
+    
     return dest;
   }
+  
   
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////

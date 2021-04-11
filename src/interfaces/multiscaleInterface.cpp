@@ -233,18 +233,18 @@ ScalarT MultiScale::initialize() {
       //KokkosTools::print(wts);
       
       pair<Kokkos::View<int**,AssemblyDevice> , vector<DRV> > basisinfo_i = subgridModels[i]->evaluateBasis2(ip);
-      vector<Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode> > > currmaps;
+      vector<Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode> > > currmaps;
 
       for (size_t j=0; j<subgridModels.size(); j++) {
         pair<Kokkos::View<int**,AssemblyDevice>, vector<DRV> > basisinfo_j = subgridModels[j]->evaluateBasis2(ip);
-	Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode> > map_over = 
-                      Teuchos::rcp(new Tpetra::CrsMatrix<ScalarT,LO,int,HostNode>(subgridModels[i]->overlapped_graph));
+	Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode> > map_over =
+                      Teuchos::rcp(new Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode>(subgridModels[i]->overlapped_graph));
         //matrix_RCP map_over = Tpetra::createCrsMatrix<ScalarT>(subgridModels[i]->overlapped_map);
         //Teuchos::rcp(new LA_CrsMatrix(Copy, *(subgridModels[i]->overlapped_map), -1)); // reset Jacobian
         
-        Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode> > map;
+        Teuchos::RCP<Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode> > map;
         if (subgridModels[i]->LocalComm->getSize() > 1) {
-          map = Teuchos::rcp(new Tpetra::CrsMatrix<ScalarT,LO,int,HostNode>(subgridModels[i]->overlapped_graph));
+          map = Teuchos::rcp(new Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode>(subgridModels[i]->overlapped_graph));
 
           map->setAllToScalar(0.0);
         }
@@ -255,14 +255,14 @@ ScalarT MultiScale::initialize() {
         //Teuchos::rcp(new LA_CrsMatrix(Copy, *(subgridModels[i]->owned_map), -1)); // reset Jacobian
         
         Teuchos::Array<ScalarT> vals(1);
-        Teuchos::Array<LO> cols(1);
+        Teuchos::Array<GO> cols(1);
         
         for (size_t k=0; k<ip.extent(1); k++) {
           int icell = basisinfo_i.first(k,0);
           int jcell = basisinfo_j.first(k,0);
           for (size_t r=0; r<basisinfo_i.second[k].extent(0);r++) {
             for (size_t p=0; p<basisinfo_i.second[k].extent(1);p++) {
-              int igid = basisinfo_i.first(k,p+1);
+              GO igid = basisinfo_i.first(k,p+1);
               for (size_t s=0; s<basisinfo_j.second[k].extent(0);s++) {
                 for (size_t q=0; q<basisinfo_j.second[k].extent(1);q++) {
                   cols[0] = basisinfo_j.first(k,q+1);
@@ -290,11 +290,11 @@ ScalarT MultiScale::initialize() {
     }
     
     for (size_t i=0; i<subgridModels.size(); i++) {
-      Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > dummy_vec = 
-                Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,int,HostNode>(subgridModels[i]->overlapped_map,1));
-      Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > dummy_vec2 = 
-                Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,int,HostNode>(subgridModels[i]->overlapped_map,1));
-      Teuchos::RCP<Amesos2::Solver<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode>,Tpetra::MultiVector<ScalarT,LO,int,HostNode>> > Am2Solver = Amesos2::create<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode>,Tpetra::MultiVector<ScalarT,LO,int,HostNode>>("KLU2",subgrid_projection_maps[i][i], dummy_vec, dummy_vec2);
+      Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,GO,HostNode> > dummy_vec =
+                Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,GO,HostNode>(subgridModels[i]->overlapped_map,1));
+      Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,GO,HostNode> > dummy_vec2 =
+                Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,GO,HostNode>(subgridModels[i]->overlapped_map,1));
+      Teuchos::RCP<Amesos2::Solver<Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode>,Tpetra::MultiVector<ScalarT,LO,GO,HostNode>> > Am2Solver = Amesos2::create<Tpetra::CrsMatrix<ScalarT,LO,GO,HostNode>,Tpetra::MultiVector<ScalarT,LO,GO,HostNode>>("KLU2",subgrid_projection_maps[i][i], dummy_vec, dummy_vec2);
       //Teuchos::RCP<Amesos2::Solver<Tpetra::CrsGraph<LO,int,HostNode>,Tpetra::MultiVector<ScalarT,LO,int,HostNode> > > Am2Solver = 
       //          Amesos2::create<Tpetra::CrsMatrix<ScalarT,LO,int,HostNode>,Tpetra::MultiVector<ScalarT,LO,int,HostNode>>("KLU2",subgrid_projection_maps[i][i], dummy_vec, dummy_vec2);
 
@@ -374,14 +374,14 @@ ScalarT MultiScale::update() {
               int usernum = cells[b][e]->subgrid_usernum[c];
               // get the time/solution from old subgrid model at last time step
               int lastindex = subgridModels[oldmodel]->soln->times[usernum].size()-1;
-              Teuchos::RCP< Tpetra::MultiVector<ScalarT,LO,int,HostNode> > lastsol = subgridModels[oldmodel]->soln->data[usernum][lastindex];
+              Teuchos::RCP< Tpetra::MultiVector<ScalarT,LO,GO,HostNode> > lastsol = subgridModels[oldmodel]->soln->data[usernum][lastindex];
               ScalarT lasttime = subgridModels[oldmodel]->soln->times[usernum][lastindex];
-              Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > projvec = 
-                        Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,int,HostNode>(subgridModels[newmodel[c]]->owned_map,1));
+              Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,GO,HostNode> > projvec =
+                        Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,GO,HostNode>(subgridModels[newmodel[c]]->owned_map,1));
               subgrid_projection_maps[newmodel[c]][oldmodel]->apply(*lastsol, *projvec);
               
-              Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,int,HostNode> > newvec = 
-                       Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,int,HostNode>(subgridModels[newmodel[c]]->owned_map,1));
+              Teuchos::RCP<Tpetra::MultiVector<ScalarT,LO,GO,HostNode> > newvec =
+                       Teuchos::rcp(new Tpetra::MultiVector<ScalarT,LO,GO,HostNode>(subgridModels[newmodel[c]]->owned_map,1));
               subgrid_projection_solvers[newmodel[c]]->setB(projvec);
               subgrid_projection_solvers[newmodel[c]]->setX(newvec);
               

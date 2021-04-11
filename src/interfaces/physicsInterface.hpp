@@ -321,7 +321,7 @@ public:
   vector<Kokkos::View<int****,HostDevice> > side_info;
   vector<vector<vector<size_t> > > localDirichletSideIDs, globalDirichletSideIDs;
   vector<vector<vector<size_t> > > boundDirichletElemIDs;
-  vector<vector<int> > dbc_dofs;
+  vector<vector<GO> > dbc_dofs;
   vector<Kokkos::View<int**,AssemblyDevice> > var_bcs;
   
   //vector<FCint> offsets;

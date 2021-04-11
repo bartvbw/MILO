@@ -1220,7 +1220,7 @@ void solver::setDirichlet(vector_RCP & initial) {
   //auto meas_kv = meas->getLocalView<HostDevice>();
   
   // TMW: this function needs to be fixed
-  vector<vector<int> > fixedDOFs = phys->dbc_dofs;
+  vector<vector<GO> > fixedDOFs = phys->dbc_dofs;
   
   for (size_t b=0; b<blocknames.size(); b++) {
     string blockID = blocknames[b];
@@ -1282,11 +1282,11 @@ void solver::setDirichlet(vector_RCP & initial) {
       }
     }
     // set point dbcs
-    vector<LO> dbc_dofs = fixedDOFs[b];
+    vector<GO> dbc_dofs = fixedDOFs[b];
     
     for (int i = 0; i < dbc_dofs.size(); i++) {
-      LO row = LA_overlapped_map->getLocalElement(dbc_dofs[i]);
-      init_kv(row,0) = 0.0; // fix to zero for now
+      //GO row = LA_overlapped_map->getLocalElement(dbc_dofs[i]);
+      //init_kv(row,0) = 0.0; // fix to zero for now
     }
     
   }

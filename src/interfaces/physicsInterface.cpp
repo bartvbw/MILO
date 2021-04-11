@@ -1178,7 +1178,7 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
     
     std::vector<std::vector<size_t> > block_SideIDs, block_GlobalSideIDs;
     std::vector<std::vector<size_t> > block_ElemIDs;
-    std::vector<int> block_dbc_dofs;
+    std::vector<GO> block_dbc_dofs;
     
     std::string perBCs = settings->sublist("Mesh").get<string>("Periodic Boundaries","");
     
@@ -1338,8 +1338,8 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
     Teuchos::reduceAll(*Commptr,Teuchos::REDUCE_SUM,1,&localsize,&globalsize);
     //Commptr->SumAll(&localsize, &globalsize, 1);
     int gathersize = Commptr->getSize()*globalsize;
-    int *block_dbc_dofs_local = new int [globalsize];
-    int *block_dbc_dofs_global = new int [gathersize];
+    GO *block_dbc_dofs_local = new GO [globalsize];
+    GO *block_dbc_dofs_global = new GO [gathersize];
     
     
     for (int i = 0; i < globalsize; i++) {
@@ -1353,7 +1353,7 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
     
     //Commptr->GatherAll(block_dbc_dofs_local, block_dbc_dofs_global, globalsize);
     Teuchos::gatherAll(*Commptr, globalsize, &block_dbc_dofs_local[0], gathersize, &block_dbc_dofs_global[0]);
-    vector<int> all_dbcs;
+    vector<GO> all_dbcs;
     
     for (int i = 0; i < gathersize; i++) {
       all_dbcs.push_back(block_dbc_dofs_global[i]);
@@ -1361,7 +1361,7 @@ void physics::setBCData(Teuchos::RCP<Teuchos::ParameterList> & settings,
     delete [] block_dbc_dofs_local;
     delete [] block_dbc_dofs_global;
     
-    vector<int> dbc_final;
+    vector<GO> dbc_final;
     vector<panzer::GlobalOrdinal> ownedAndShared;
     DOF->getOwnedAndGhostedIndices(ownedAndShared);
     

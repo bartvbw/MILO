@@ -260,12 +260,12 @@ void ParameterManager::setupDiscretizedParameters(vector<vector<Teuchos::RCP<cel
     
     for (size_t b=0; b<cells.size(); b++) {
       for (size_t e=0; e<cells[b].size(); e++) {
-        vector<vector<int> > GIDs;
+        vector<vector<GO> > GIDs;
         int numElem = cells[b][e]->numElem;
         int numLocalDOF = 0;
         for (int p=0; p<numElem; p++) {
           size_t elemID = cells[b][e]->localElemID(p);//disc->myElements[b][eprog+p];
-          vector<int> localGIDs;
+          vector<GO> localGIDs;
           paramDOF->getElementGIDs(elemID, localGIDs, blocknames[b]);
           GIDs.push_back(localGIDs);
           numLocalDOF = localGIDs.size(); // should be the same for all elements
@@ -282,12 +282,12 @@ void ParameterManager::setupDiscretizedParameters(vector<vector<Teuchos::RCP<cel
     }
     for (size_t b=0; b<boundaryCells.size(); b++) {
       for (size_t e=0; e<boundaryCells[b].size(); e++) {
-        vector<vector<int> > GIDs;
+        vector<vector<GO> > GIDs;
         int numElem = boundaryCells[b][e]->numElem;
         int numLocalDOF = 0;
         for (int p=0; p<numElem; p++) {
           size_t elemID = boundaryCells[b][e]->localElemID(p);//disc->myElements[b][eprog+p];
-          vector<int> localGIDs;
+          vector<GO> localGIDs;
           paramDOF->getElementGIDs(elemID, localGIDs, blocknames[b]);
           GIDs.push_back(localGIDs);
           numLocalDOF = localGIDs.size(); // should be the same for all elements
@@ -573,14 +573,14 @@ void ParameterManager::updateParams(const vector<ScalarT> & newparams, const int
   if ((type == 4) && (globalParamUnknowns > 0)) {
     int numClassicParams = this->getNumParams(1); // offset for ROL param vector
     for (size_t i = 0; i < paramOwnedAndShared.size(); i++) {
-      int gid = paramOwnedAndShared[i];
+      GO gid = paramOwnedAndShared[i];
       Psol[0]->replaceGlobalValue(gid,0,newparams[gid+numClassicParams]);
     }
   }
   if ((type == 2) && (globalParamUnknowns > 0)) {
     int numClassicParams = this->getNumParams(2); // offset for ROL param vector
     for (size_t i=0; i<paramOwnedAndShared.size(); i++) {
-      int gid = paramOwnedAndShared[i];
+      GO gid = paramOwnedAndShared[i];
       Psol[0]->replaceGlobalValue(gid,0,newparams[i+numClassicParams]);
     }
   }

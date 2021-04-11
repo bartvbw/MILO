@@ -157,8 +157,8 @@ public:
   int numParamUnknowns;     					 // total number of unknowns
   int numParamUnknownsOS;     					 // total number of unknowns
   int globalParamUnknowns; // total number of unknowns across all processors
-  vector<int> paramOwned;					 // GIDs that live on the local processor.
-  vector<int> paramOwnedAndShared;				 // GIDs that live or are shared on the local processor.
+  vector<GO> paramOwned;					 // GIDs that live on the local processor.
+  vector<GO> paramOwnedAndShared;				 // GIDs that live or are shared on the local processor.
   
   vector<int> paramtypes;
   vector<vector<int>> paramNodes;  // for distinguishing between parameter fields when setting initial
